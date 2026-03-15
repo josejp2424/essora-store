@@ -15,19 +15,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-# Verify we are in Essora Linux
-OS_RELEASE="/usr/lib/os-release"
-if [[ ! -f "$OS_RELEASE" ]]; then
-    echo "Error: $OS_RELEASE not found" >&2
-    exit 1
-fi
-
-# Look for NAME="Essora" in the os-release file
-if ! grep -q 'NAME="Essora"' "$OS_RELEASE" 2>/dev/null; then
-    echo "This script can only be run on Essora Linux" >&2
-    exit 1
-fi
-
 OUT="/usr/local/essora-store/flatpak.txt"
 REMOTE="flathub"
 
