@@ -192,7 +192,9 @@ See [LICENSE](LICENSE) or <https://www.gnu.org/licenses/gpl-3.0.html> for detail
 
 ## Author
 
-**josejp2424** — Developer and maintainer of Essora Linux and its application ecosystem.
+**josejp2424**
 
-- SourceForge: <https://sourceforge.net/projects/essora/>
-- Contact: puppylinuxjosejp2424@gmail.com
+**josejp2424**
+- GitHub: [https://github.com/josejp2424](https://github.com/josejp2424)
+- SourceForge: [https://sourceforge.net/projects/essora/](https://sourceforge.net/projects/essora/)
+- Contact: [Telgram Essora](https://t.me/essoralinux#)
