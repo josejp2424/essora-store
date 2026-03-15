@@ -66,10 +66,6 @@ The application is written entirely in Python 3 using GTK3 (via PyGObject), foll
 - Uses a **Unix socket lock** (`/tmp/essora-store.lock`) to prevent duplicate instances
 - If already running, a second launch brings the existing window to focus instead of opening a new one
 
-### Essora-Only Guard
-- On startup, reads `/usr/lib/os-release` (fallback: `/etc/os-release`) and verifies `NAME=Essora`
-- Displays a clear error dialog and exits gracefully if run on an unsupported system
-
 ### Multilingual Support
 Automatic language detection via system locale. Translations loaded from `/usr/local/essora-store/lang/<code>.json`. Falls back to English if the language file is not found.
 
