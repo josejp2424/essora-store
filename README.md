@@ -194,7 +194,6 @@ See [LICENSE](LICENSE) or <https://www.gnu.org/licenses/gpl-3.0.html> for detail
 
 **josejp2424**
 
-**josejp2424**
 - GitHub: [https://github.com/josejp2424](https://github.com/josejp2424)
 - SourceForge: [https://sourceforge.net/projects/essora/](https://sourceforge.net/projects/essora/)
 - Contact: [Telgram Essora](https://t.me/essoralinux#)
