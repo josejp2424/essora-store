@@ -1,0 +1,345 @@
+#!/usr/bin/env python3
+# Essora Store
+# Copyright (C) 2025 josejp2424
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <https://www.gnu.org/licenses/>.
+
+import os
+import json
+import subprocess
+import sys
+from pathlib import Path
+
+CACHE_PATH = "/usr/local/essora-store/deb-store.json"
+GENERIC_DEB_ICON = "/usr/local/essora-store/icons/app_debian.png"
+
+
+def run_cmd(cmd):
+    """Execute command and return (returncode, stdout, stderr)"""
+    try:
+        proc = subprocess.Popen(
+            cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+        )
+        out, err = proc.communicate()
+        return proc.returncode, out, err
+    except Exception as e:
+        return -1, "", str(e)
+
+
+def apt_update():
+    """Update APT repository indexes"""
+    print("[DEB-DB] Running: apt-get update")
+    rc, out, err = run_cmd(["apt-get", "update"])
+    if out:
+        print(out)
+    if err:
+        print(err, file=sys.stderr)
+    if rc != 0:
+        print(f"[DEB-DB] apt-get update finished with rc={rc}", file=sys.stderr)
+
+
+def get_installed_packages():
+    """Get dictionary of installed packages with their versions"""
+    print("[DEB-DB] Getting installed packages...")
+    rc, out, err = run_cmd(["dpkg-query", "-W", "-f=${Package}\t${Version}\n"])
+    if rc != 0:
+        print(f"[DEB-DB] Error running dpkg-query: {err}", file=sys.stderr)
+        return {}
+    
+    installed = {}
+    for line in out.splitlines():
+        line = line.strip()
+        if not line or '\t' not in line:
+            continue
+        try:
+            pkg, ver = line.split('\t', 1)
+            installed[pkg.strip()] = ver.strip()
+        except ValueError:
+            continue
+    
+    print(f"[DEB-DB] Installed packages: {len(installed)}")
+    return installed
+
+
+def get_upgradable_packages():
+    """Get dictionary of upgradable packages with new version"""
+    print("[DEB-DB] Detecting upgradable packages...")
+    rc, out, err = run_cmd(["apt", "list", "--upgradable"])
+    if rc != 0:
+        print(f"[DEB-DB] Error running apt list: {err}", file=sys.stderr)
+        return {}
+    
+    upgradable = {}
+    for line in out.splitlines():
+        line = line.strip()
+       
+        if not line or line.lower().startswith(("listing", "listando")):
+            continue
+        
+        
+        if '/' not in line:
+            continue
+        
+        try:
+            parts = line.split('/', 1)
+            pkg = parts[0].strip()
+            
+
+            rest_parts = parts[1].split()
+            new_ver = rest_parts[0].strip() if rest_parts else ""
+            
+            if pkg and new_ver:
+                upgradable[pkg] = new_ver
+        except (IndexError, AttributeError):
+            continue
+    
+    print(f"[DEB-DB] Upgradable packages: {len(upgradable)}")
+    return upgradable
+
+
+def parse_apt_available():
+    """
+    Get all available packages from repositories
+    using apt-cache dumpavail
+    """
+    print("[DEB-DB] Reading available packages with apt-cache dumpavail...")
+    rc, out, err = run_cmd(["apt-cache", "dumpavail"])
+    if err:
+        print(err, file=sys.stderr)
+    if rc != 0:
+        print(f"[DEB-DB] apt-cache dumpavail finished with rc={rc}", file=sys.stderr)
+        return {}
+
+    pkgs = {}
+    blocks = out.split("\n\n")
+    
+    for block in blocks:
+        block = block.strip()
+        if not block:
+            continue
+
+        entry = {
+            "name": None,
+            "version": "",
+            "section": "",
+            "description": "",
+        }
+
+        current_field = None
+        desc_lines = []
+
+        for line in block.splitlines():
+            if not line:
+                continue
+            if line[0].isspace():
+                if current_field == "Description":
+                    desc_lines.append(line.strip())
+                continue
+
+            if ":" not in line:
+                continue
+
+            try:
+                field, val = line.split(":", 1)
+            except ValueError:
+                continue
+                
+            field = field.strip()
+            val = val.strip()
+            current_field = field
+
+            if field == "Package":
+                entry["name"] = val
+            elif field == "Version":
+                entry["version"] = val
+            elif field == "Section":
+                entry["section"] = val
+            elif field == "Description":
+                desc_lines.append(val)
+
+        if desc_lines:
+            entry["description"] = " ".join(desc_lines).strip()
+
+        if entry["name"]:
+
+            pkgs[entry["name"]] = entry
+
+    print(f"[DEB-DB] Available packages in repos: {len(pkgs)}")
+    return pkgs
+
+
+def add_essora_kernels(pkgs):
+    """Find and mark linux-image-*essora kernels"""
+    print("[DEB-DB] Looking for linux-image-*essora kernels...")
+    rc, out, err = run_cmd(["apt-cache", "search", "linux-image-"])
+    if err:
+        print(err, file=sys.stderr)
+    if rc != 0:
+        print(f"[DEB-DB] apt-cache search finished with rc={rc}", file=sys.stderr)
+        return
+
+    count = 0
+    for line in out.splitlines():
+        line = line.strip()
+        if " - " not in line:
+            continue
+        
+        try:
+            name, descr = line.split(" - ", 1)
+        except ValueError:
+            continue
+            
+        name = name.strip()
+        descr = descr.strip()
+
+        if not name.startswith("linux-image-"):
+            continue
+        if not name.endswith("essora"):
+            continue
+
+        if name in pkgs:
+            pkgs[name]["is_kernel_essora"] = True
+            if descr and not pkgs[name].get("description"):
+                pkgs[name]["description"] = descr
+        else:
+
+            rc_show, out_show, _ = run_cmd(["apt-cache", "show", name])
+            ver = ""
+            if rc_show == 0:
+                for ln in out_show.splitlines():
+                    if ln.startswith("Version:"):
+                        try:
+                            ver = ln.split(":", 1)[1].strip()
+                        except (IndexError, ValueError):
+                            pass
+                        break
+            
+            pkgs[name] = {
+                "name": name,
+                "version": ver,
+                "section": "kernel",
+                "description": descr,
+                "is_kernel_essora": True,
+            }
+        count += 1
+
+    print(f"[DEB-DB] Essora kernels detected: {count}")
+
+
+def generate_json(pkgs_dict, installed_map, upgradable_map):
+    """
+    Generate JSON list with format expected by engine.py
+    
+    Generated fields:
+    - package: package name
+    - name: display name (same as package for now)
+    - description: package description
+    - section: section/category
+    - installed: bool - if installed
+    - installed_version: installed version (empty if not installed)
+    - available_version: available version in repos
+    - update_available: bool - if update is available
+    - is_kernel_essora: bool - if essora kernel (optional)
+    """
+    result = []
+    
+    for pkg_name, pkg_data in pkgs_dict.items():
+        is_installed = pkg_name in installed_map
+        inst_ver = installed_map.get(pkg_name, "")
+        avail_ver = pkg_data.get("version", "")
+        has_update = pkg_name in upgradable_map
+        
+ 
+        if has_update:
+            avail_ver = upgradable_map[pkg_name]
+        
+        entry = {
+            "package": pkg_name,
+            "name": pkg_data.get("name", pkg_name),
+            "description": pkg_data.get("description", ""),
+            "section": pkg_data.get("section", "misc"),
+            "installed": is_installed,
+            "installed_version": inst_ver,
+            "available_version": avail_ver,
+            "update_available": has_update,
+        }
+        
+
+        if pkg_data.get("is_kernel_essora"):
+            entry["is_kernel_essora"] = True
+        
+        result.append(entry)
+    
+
+    result.sort(key=lambda x: x["package"])
+    
+    return result
+
+
+def save_cache(data, cache_path=CACHE_PATH):
+    """Save JSON atomically using temporary file"""
+    os.makedirs(os.path.dirname(cache_path), exist_ok=True)
+    
+    tmp_path = cache_path + ".tmp"
+    try:
+        with open(tmp_path, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+        os.replace(tmp_path, cache_path)
+        print(f"[DEB-DB] Written {cache_path} ({len(data)} packages).")
+    except Exception as e:
+        print(f"[DEB-DB] Error writing {cache_path}: {e}", file=sys.stderr)
+        if os.path.exists(tmp_path):
+            try:
+                os.remove(tmp_path)
+            except Exception:
+                pass
+
+
+def main():
+    print("=" * 70)
+    print("Essora Store: Generating optimized DEB database")
+    print("=" * 70)    
+    apt_update()
+    print()    
+    installed_map = get_installed_packages()
+    upgradable_map = get_upgradable_packages()
+    print()
+    avail_map = parse_apt_available()
+    print()    
+    add_essora_kernels(avail_map)
+    print()    
+    json_data = generate_json(avail_map, installed_map, upgradable_map)    
+    save_cache(json_data)   
+    installed_count = sum(1 for x in json_data if x["installed"])
+    update_count = sum(1 for x in json_data if x["update_available"])
+    kernel_count = sum(1 for x in json_data if x.get("is_kernel_essora"))
+    
+    print()
+    print("=" * 70)
+    print(f"Total packages in catalog: {len(json_data)}")
+    print(f"  - Installed: {installed_count}")
+    print(f"  - Updates available: {update_count}")
+    print(f"  - Essora kernels: {kernel_count}")
+    print("=" * 70)
+    print()
+    print("The GUI will now load instantly without lag.")
+    print("Run this script periodically or from the Refresh button in the GUI.")
+    
+    return 0
+
+if __name__ == "__main__":
+    sys.exit(main())

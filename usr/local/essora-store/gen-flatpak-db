@@ -1,0 +1,142 @@
+#!/bin/bash
+# Essora Store
+# Copyright (C) 2025 josejp2424
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <https://www.gnu.org/licenses/>.
+
+# Verify we are in Essora Linux
+OS_RELEASE="/usr/lib/os-release"
+if [[ ! -f "$OS_RELEASE" ]]; then
+    echo "Error: $OS_RELEASE not found" >&2
+    exit 1
+fi
+
+# Look for NAME="Essora" in the os-release file
+if ! grep -q 'NAME="Essora"' "$OS_RELEASE" 2>/dev/null; then
+    echo "This script can only be run on Essora Linux" >&2
+    exit 1
+fi
+
+OUT="/usr/local/essora-store/flatpak.txt"
+REMOTE="flathub"
+
+mkdir -p "$(dirname "$OUT")"
+
+echo "== Essora Store: generating flatpak.txt from $REMOTE =="
+
+# 1. Get installed apps with their versions
+declare -A INST
+declare -A INST_VER
+echo "Reading installed apps..."
+while IFS=$'\t' read -r app_id ver branch name; do
+    [[ -z "$app_id" ]] && continue
+    INST["$app_id"]=1
+
+    if [[ -n "$ver" ]]; then
+        INST_VER["$app_id"]="$ver"
+    elif [[ -n "$branch" ]]; then
+        INST_VER["$app_id"]="$branch"
+    else
+        INST_VER["$app_id"]=""
+    fi
+done < <(flatpak list --app --columns=application,version,branch,name 2>/dev/null)
+
+echo "   - ${#INST[@]} installed apps"
+
+# 2. Detect available updates (improved method)
+declare -A UPD
+declare -A UPD_VER
+
+echo "Checking for updates..."
+
+# Method 1: flatpak remote-ls --updates (more reliable)
+while IFS=$'\t' read -r name app_id ver branch; do
+    [[ -z "$app_id" ]] && continue
+    UPD["$app_id"]=1
+    
+    # Save available version
+    if [[ -n "$ver" ]]; then
+        UPD_VER["$app_id"]="$ver"
+    elif [[ -n "$branch" ]]; then
+        UPD_VER["$app_id"]="$branch"
+    fi
+done < <(flatpak remote-ls --updates --app --columns=name,application,version,branch 2>/dev/null)
+
+# Method 2 (fallback): flatpak update --assumeno
+# Only if method 1 found nothing
+if [[ ${#UPD[@]} -eq 0 ]]; then
+    echo "   - Method 1 failed, using fallback..."
+    while IFS= read -r ln; do
+        ln="${ln//$'\r'/}"
+        ln="${ln## }"; ln="${ln%% }"
+        [[ -z "$ln" ]] && continue
+
+        # Extract app_id (format: org.example.App)
+        if [[ "$ln" =~ ^[A-Za-z0-9]+(\.[A-Za-z0-9]+){2,}$ ]]; then
+            UPD["$ln"]=1
+        fi
+    done < <(flatpak update --app --assumeno 2>/dev/null || true)
+fi
+
+echo "   - ${#UPD[@]} updates available"
+
+# 3. Generate flatpak.txt with all information
+{
+    echo "# format: STATE|ID|NAME|REMOTE|DESCRIPTION|INSTALLED_VER|AVAILABLE_VER|UPDATE"
+    echo "# STATE: I = installed, A = available"
+    echo "# UPDATE: 1 = update available, 0 = no"
+    
+    flatpak remote-ls "$REMOTE" --app --columns=application,name,description,version,branch 2>/dev/null \
+        | while IFS=$'\t' read -r app_id name desc avail_ver avail_branch; do
+            [[ -z "$app_id" ]] && continue
+            
+            # State: installed or available
+            state="A"
+            [[ "${INST[$app_id]}" == "1" ]] && state="I"
+
+            # Installed version
+            inst_ver="${INST_VER[$app_id]}"
+            av=""
+            if [[ -n "$avail_ver" ]]; then
+                av="$avail_ver"
+            elif [[ -n "$avail_branch" ]]; then
+                av="$avail_branch"
+            fi
+            
+            if [[ "${UPD[$app_id]}" == "1" && -z "$av" && -n "${UPD_VER[$app_id]}" ]]; then
+                av="${UPD_VER[$app_id]}"
+            fi
+            upd="0"
+            if [[ "${UPD[$app_id]}" == "1" ]]; then
+                upd="1"
+            elif [[ "$state" == "I" && -n "$inst_ver" && -n "$av" && "$inst_ver" != "$av" ]]; then
+                upd="1"
+            fi
+            desc_clean=${desc//|/ -}
+
+            printf '%s|%s|%s|%s|%s|%s|%s|%s\n' \
+                "$state" "$app_id" "$name" "$REMOTE" "$desc_clean" "$inst_ver" "$av" "$upd"
+          done
+} > "$OUT"
+
+# 4. Statistics
+total=$(grep -c "^[IA]|" "$OUT" 2>/dev/null || echo "0")
+installed=$(grep -c "^I|" "$OUT" 2>/dev/null || echo "0")
+updates=$(grep -c "|1$" "$OUT" 2>/dev/null || echo "0")
+
+echo ""
+echo "Done. Flatpak database generated at: $OUT"
+echo "   - Total apps: $total"
+echo "   - Installed: $installed"
+echo "   - Updates available: $updates"

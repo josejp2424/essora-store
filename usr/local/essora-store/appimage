@@ -1,0 +1,209 @@
+#!/bin/bash
+# Essora Store
+# Copyright (C) 2025 josejp2424
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <https://www.gnu.org/licenses/>.
+
+set -euo pipefail
+
+JSON_FILE="/usr/local/essora-store/appimage-store.json"
+ICON_PATH="/usr/local/essora-store/icons/app_appimage.png"
+ARCHIVE_URL="https://archive.org/download/appimage"
+TEMP_FILE="/tmp/archive_appimages.html"
+
+# Where AppImages are considered installed
+APPIMAGE_DIR_USER="${HOME}/Applications"
+APPIMAGE_ROOT_SYSTEM="/opt/appimage"
+
+mkdir -p "$(dirname "$JSON_FILE")" "$APPIMAGE_DIR_USER" 2>/dev/null || true
+
+echo "== Essora Store: generating appimage-store.json =="
+
+download_list() {
+  echo "Downloading AppImage list from archive.org…"
+  if command -v curl >/dev/null 2>&1; then
+    curl -fsSL "$ARCHIVE_URL" -o "$TEMP_FILE"
+  elif command -v wget >/dev/null 2>&1; then
+    wget -q "$ARCHIVE_URL" -O "$TEMP_FILE"
+  else
+    echo "ERROR: curl or wget is required" >&2
+    exit 1
+  fi
+}
+
+extract_version() {
+  # 1) semver-ish (1.2.3)
+  local s="$1"
+  local v
+  v=$(echo "$s" | grep -oE '([0-9]+\.)+[0-9]+' | head -n1 || true)
+  if [[ -n "$v" ]]; then
+    echo "$v"
+    return
+  fi
+  # 2) dates like 20240101
+  v=$(echo "$s" | grep -oE '20[0-9]{2}[0-9]{2}([0-9]{2})?' | head -n1 || true)
+  echo "$v"
+}
+
+normalize_id() {
+  # convert to stable id
+  echo "$1" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g; s/--*/-/g; s/^-//; s/-$//'
+}
+
+clean_name_from_filename() {
+  # similar to previous script
+  local base="$1"
+  base=${base%.AppImage}
+  base=$(echo "$base" | \
+    sed -E 's/[-_](x86_64|i386|i686|amd64|linux|Linux|X64|x64|X86|windows|Windows)//g' | \
+    sed -E 's/[-_]([0-9]+\.[0-9]+(\.[0-9]+)*)//g' | \
+    sed -E 's/[-_]20[0-9]{2}([0-9]{2})*//g' | \
+    sed 's/[-_]$//' | sed 's/^[-_]//')
+  [[ -z "$base" || "$base" == "." ]] && base="${1%.AppImage}"
+  echo "$base"
+}
+
+display_name() {
+  echo "$1" | sed 's/_/ /g; s/-/ /g; s/\./ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) tolower(substr($i,2))}1'
+}
+
+ver_newer() {
+  # returns 0 if v2 > v1
+  local v1="$1"
+  local v2="$2"
+  [[ -z "$v1" || -z "$v2" ]] && return 1
+  local top
+  top=$(printf '%s\n%s\n' "$v1" "$v2" | sort -V | tail -n1)
+  [[ "$top" == "$v2" && "$v2" != "$v1" ]]
+}
+
+find_installed_path() {
+  local app_id="$1"
+  local p1="$APPIMAGE_ROOT_SYSTEM/$app_id/$app_id.AppImage"
+  if [[ -f "$p1" ]]; then
+    echo "$p1"
+    return
+  fi
+  # fallback: search in ~/Applications for something containing the id
+  local found
+  found=$(find "$APPIMAGE_DIR_USER" -maxdepth 1 -type f -iname "*${app_id}*.AppImage" 2>/dev/null | head -n1 || true)
+  echo "$found"
+}
+
+download_list
+
+if [[ ! -s "$TEMP_FILE" ]]; then
+  echo "ERROR: Could not download AppImage list" >&2
+  exit 1
+fi
+
+# Extract .AppImage names from HTML
+TMP_ENTRIES="/tmp/appimage_entries.$$"
+TMP_PICKED="/tmp/appimage_picked.$$"
+trap 'rm -f "$TEMP_FILE" "$TMP_ENTRIES" "$TMP_PICKED"' EXIT
+
+echo "Processing list…"
+
+while IFS= read -r filename; do
+  # clean '>'
+  filename=${filename#>}
+  [[ -z "$filename" ]] && continue
+
+  # filter junk
+  if [[ "$filename" == *"__ia_thumb"* || "$filename" == *".torrent"* || "$filename" == *".xml"* || "$filename" == *".sqlite"* ]]; then
+    continue
+  fi
+
+  clean=$(clean_name_from_filename "$filename")
+  id=$(normalize_id "$clean")
+  [[ -z "$id" ]] && continue
+
+  ver=$(extract_version "$filename")
+  disp=$(display_name "$clean")
+  printf '%s|%s|%s|%s\n' "$id" "$disp" "$ver" "$filename" >> "$TMP_ENTRIES"
+done < <(grep -o '>[^<]*\.AppImage' "$TEMP_FILE" | sed 's/^>//')
+
+if [[ ! -s "$TMP_ENTRIES" ]]; then
+  echo "ERROR: No valid AppImages found in the list." >&2
+  echo "[]" > "$JSON_FILE"
+  exit 0
+fi
+
+# Choose 1 file per app_id (the "highest" version with sort -V).
+# If an app has no detectable version, it will have an empty ver; we still pick one.
+sort -t'|' -k1,1 -k3,3V "$TMP_ENTRIES" | awk -F'|' '{pick[$1]=$0} END{for(k in pick) print pick[k]}' > "$TMP_PICKED"
+
+# Generate JSON
+echo "[" > "$JSON_FILE"
+
+first=1
+total=0
+installed_count=0
+upd_count=0
+
+while IFS='|' read -r app_id disp ver filename; do
+  [[ -z "$app_id" ]] && continue
+  total=$((total+1))
+
+  url="$ARCHIVE_URL/$filename"
+
+  inst_path=$(find_installed_path "$app_id")
+  installed=false
+  estado="A"
+  inst_ver=""
+  update_available=false
+
+  if [[ -n "$inst_path" && -f "$inst_path" ]]; then
+    installed=true
+    estado="I"
+    installed_count=$((installed_count+1))
+    inst_ver=$(extract_version "$(basename "$inst_path")")
+    if ver_newer "$inst_ver" "$ver"; then
+      update_available=true
+      upd_count=$((upd_count+1))
+    fi
+  fi
+
+  # simple description
+  desc="AppImage application: $disp"
+
+  # minimal JSON escaping
+  desc=${desc//\\/\\\\}
+  desc=${desc//\"/\\\"}
+  disp=${disp//\\/\\\\}
+  disp=${disp//\"/\\\"}
+
+  [[ $first -eq 0 ]] && echo "," >> "$JSON_FILE"
+  first=0
+
+  cat >> "$JSON_FILE" <<EOF
+  {
+    "estado": "$estado",
+    "id": "$app_id",
+    "nombre": "$disp",
+    "remoto": "archive.org",
+    "descripcion": "$desc",
+    "icono": "$ICON_PATH",
+    "url": "$url",
+    "installed": $installed,
+    "installed_version": "${inst_ver}",
+    "available_version": "${ver}",
+    "update_available": $update_available
+  }
+EOF
+done < "$TMP_PICKED"
+
+echo "]" >> "$JSON_FILE"
+echo "Done. File generated: $JSON_FILE"
+echo "• Apps: $total  |  Installed: $installed_count  |  Updates available: $upd_count"

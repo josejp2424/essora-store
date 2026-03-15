@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+GKSU="/usr/local/essora-store/gksu"
+"$GKSU" /usr/local/essora-store/essora-repo-update.py

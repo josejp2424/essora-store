@@ -1,0 +1,19 @@
+<svg width="220" height="56" viewBox="0 0 220 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="g2" x1="0" y1="0" x2="0" y2="56" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#8AAE12"/>
+      <stop offset="1" stop-color="#77960A"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-30%" width="140%" height="180%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#2F3D06" flood-opacity="0.30"/>
+    </filter>
+  </defs>
+  <rect x="4" y="4" width="212" height="48" rx="14" fill="url(#g2)" filter="url(#shadow)"/>
+  <rect x="5" y="5" width="210" height="46" rx="13" stroke="rgba(255,255,255,0.22)"/>
+  <rect x="10" y="9" width="200" height="16" rx="8" fill="white" fill-opacity="0.10"/>
+  <g transform="translate(18,15)">
+    <circle cx="12" cy="13" r="12" fill="white" fill-opacity="0.16"/>
+    <path d="M7.5 13L10.7 16.2L16.8 9.8" stroke="white" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="125" y="34" text-anchor="middle" font-family="DejaVu Sans, Arial, sans-serif" font-size="19" font-weight="700" fill="white" letter-spacing="0.2">Installed</text>
+</svg>

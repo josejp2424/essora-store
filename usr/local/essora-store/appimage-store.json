@@ -1,0 +1,1513 @@
+[
+  {
+    "estado": "A",
+    "id": "inkscape1-2",
+    "nombre": "Inkscape1 2",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Inkscape1 2",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/Inkscape1.2-x86_64.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "1.2",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "flare64-v1-13-04",
+    "nombre": "Flare64 V1 13 04",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Flare64 V1 13 04",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/flare-linux64-v1.13.04.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "1.13.04",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "croclip1-0",
+    "nombre": "Croclip1 0",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Croclip1 0",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/CroClip1.0.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "1.0",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "need-for-speed-mostwanted",
+    "nombre": "Need For Speed Mostwanted",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Need For Speed Mostwanted",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/need-for-speed-mostwanted.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "zuma-deluxe",
+    "nombre": "Zuma Deluxe",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Zuma Deluxe",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/Zuma-Deluxe.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "gnu-image-manipulation-program-1-archimage3-4-1-1",
+    "nombre": "Gnu Image Manipulation Program 1 Archimage3 4 1 1",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Gnu Image Manipulation Program 1 Archimage3 4 1 1",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/GNU-Image-Manipulation-Program_2.10.38-1-archimage3.4.1-1-x86_64.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "2.10.38",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "nerfgame",
+    "nombre": "Nerfgame",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Nerfgame",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/nerfgame.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "hfs-server",
+    "nombre": "Hfs Server",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Hfs Server",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/HFS-Server.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "lithomaker",
+    "nombre": "Lithomaker",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Lithomaker",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/LithoMaker-0.7.0-x86_64.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "0.7.0",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "mixxx",
+    "nombre": "Mixxx",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Mixxx",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/Mixxx.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "xarawebstyle3",
+    "nombre": "Xarawebstyle3",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Xarawebstyle3",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/XaraWebStyle3-x64.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "cheatbox-trucoteca",
+    "nombre": "Cheatbox Trucoteca",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Cheatbox Trucoteca",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/Cheatbox-Trucoteca-2007.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "whatsapp",
+    "nombre": "Whatsapp",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Whatsapp",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/Whatsapp.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "vet2-game-granja3d",
+    "nombre": "Vet2 Game Granja3d",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Vet2 Game Granja3d",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/Vet2-Game-Granja3D.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "bforartists-v3-2-2",
+    "nombre": "Bforartists V3 2 2",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Bforartists V3 2 2",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/bforartists-v3.2.2-x86_64.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "3.2.2",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "kdenlive-x86",
+    "nombre": "Kdenlive X86",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Kdenlive X86",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/kdenlive-22.08.2-x86_x64.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "22.08.2",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "motogp2",
+    "nombre": "Motogp2",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Motogp2",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/MotoGP2.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "wine",
+    "nombre": "Wine",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Wine",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/Wine-4.2-x86_64.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "4.2",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "crocodile3",
+    "nombre": "Crocodile3",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Crocodile3",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/Crocodile3_x86_64.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "appimagetool",
+    "nombre": "Appimagetool",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Appimagetool",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/appimagetool-x86_64.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "alienshooter",
+    "nombre": "Alienshooter",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Alienshooter",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/alienShooter.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "",
+    "update_available": false
+  }
+,
+  {
+    "estado": "I",
+    "id": "appimagepool-fd4cc9ce4dd8e3a99594d0368307bb67",
+    "nombre": "Appimagepool Fd4cc9ce4dd8e3a99594d0368307bb67",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Appimagepool Fd4cc9ce4dd8e3a99594d0368307bb67",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/appimagepool-5.0.0-x86_64_fd4cc9ce4dd8e3a99594d0368307bb67.AppImage",
+    "installed": true,
+    "installed_version": "",
+    "available_version": "5.0.0",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "psp",
+    "nombre": "Psp",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Psp",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/PSP.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "ppssppsdl-v1-17-1",
+    "nombre": "Ppssppsdl V1 17 1",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Ppssppsdl V1 17 1",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/PPSSPPSDL-V1.17.1.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "1.17.1",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "dolphin-emulator",
+    "nombre": "Dolphin Emulator",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Dolphin Emulator",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/Dolphin_Emulator-x86_64.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "plants-sombies",
+    "nombre": "Plants Sombies",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Plants Sombies",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/Plants-Sombies.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "kdenlive",
+    "nombre": "Kdenlive",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Kdenlive",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/kdenlive-24.05.0-x86_64.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "24.05.0",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "popsicle-usb-flasher-4bab3d8055fe65b4bc3c3ea7085d14e7-4bab3d8055fe65b4bc3c3ea7085d14e7",
+    "nombre": "Popsicle Usb Flasher 4bab3d8055fe65b4bc3c3ea7085d14e7 4bab3d8055fe65b4bc3c3ea7085d14e7",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Popsicle Usb Flasher 4bab3d8055fe65b4bc3c3ea7085d14e7 4bab3d8055fe65b4bc3c3ea7085d14e7",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/Popsicle_USB_Flasher-1.3.0-x86_64_4bab3d8055fe65b4bc3c3ea7085d14e7_4bab3d8055fe65b4bc3c3ea7085d14e7.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "1.3.0",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "startcraft",
+    "nombre": "Startcraft",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Startcraft",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/startcraft.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "livewire",
+    "nombre": "Livewire",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Livewire",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/LiveWire.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "leyohm",
+    "nombre": "Leyohm",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Leyohm",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/LeyOhm.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "dbgate-beta",
+    "nombre": "Dbgate Beta",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Dbgate Beta",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/dbgate-beta.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "quake1",
+    "nombre": "Quake1",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Quake1",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/QUAKE1.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "pcbwizard",
+    "nombre": "Pcbwizard",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Pcbwizard",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/PcbWizard.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "caprinefacebook",
+    "nombre": "Caprinefacebook",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Caprinefacebook",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/CaprineFacebook.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "gta2",
+    "nombre": "Gta2",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Gta2",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/gta2.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "gta3",
+    "nombre": "Gta3",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Gta3",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/Gta3.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "appimagelint",
+    "nombre": "Appimagelint",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Appimagelint",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/appimagelint-x86_64.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "3dmax-dos",
+    "nombre": "3dmax Dos",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: 3dmax Dos",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/3DMAX-DOS-x86_64.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "qtcreator",
+    "nombre": "Qtcreator",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Qtcreator",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/Qtcreator.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "melodie",
+    "nombre": "Melodie",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Melodie",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/melodie-1.0.0-x86_64.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "1.0.0",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "7wondersii",
+    "nombre": "7wondersii",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: 7wondersii",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/7WondersII.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "deltaforcealcon",
+    "nombre": "Deltaforcealcon",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Deltaforcealcon",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/DeltaForceAlcon-x86_64.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "shotcut20-04-12",
+    "nombre": "Shotcut20 04 12",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Shotcut20 04 12",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/Shotcut20.04.12.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "20.04.12",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "deltachat",
+    "nombre": "Deltachat",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Deltachat",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/DeltaChat-1.46.1.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "1.46.1",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "powertranslator",
+    "nombre": "Powertranslator",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Powertranslator",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/PowerTranslator.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "olive",
+    "nombre": "Olive",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Olive",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/Olive-2019.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "glr-st",
+    "nombre": "Glr St",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Glr St",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/glr-st-x86_64.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "valheim0-7",
+    "nombre": "Valheim0 7",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Valheim0 7",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/Valheim0.7.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "0.7",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "cube-puzzle",
+    "nombre": "Cube Puzzle",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Cube Puzzle",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/cube-puzzle.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "wine-stable-multi",
+    "nombre": "Wine Stable Multi",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Wine Stable Multi",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/wine-stable-multi_4.0.4-x86_64.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "4.0.4",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "mgba",
+    "nombre": "Mgba",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Mgba",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/mGBA-0.9.2-x86_64.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "0.9.2",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "3dmax-5-full-requiere-qemu-kvm",
+    "nombre": "3dmax 5 Full Requiere Qemu Kvm",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: 3dmax 5 Full Requiere Qemu Kvm",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/3dmax-5-full-requiere-qemu-KVM.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "vokoscreenng",
+    "nombre": "Vokoscreenng",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Vokoscreenng",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/VokoscreenNG.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "formatfactory3",
+    "nombre": "Formatfactory3",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Formatfactory3",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/FormatFactory3.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "publisher",
+    "nombre": "Publisher",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Publisher",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/Publisher-2007.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "yangdownloader",
+    "nombre": "Yangdownloader",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Yangdownloader",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/YangDownloader-2.2-Linux-x64.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "2.2",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "vscode",
+    "nombre": "Vscode",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Vscode",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/VSCode-x86_64.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "makehuman",
+    "nombre": "Makehuman",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Makehuman",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/MakeHuman.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "excel",
+    "nombre": "Excel",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Excel",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/EXCEL-2007.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "mkappimage-709",
+    "nombre": "Mkappimage 709",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Mkappimage 709",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/mkappimage-709-x86_64.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "cingg",
+    "nombre": "Cingg",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Cingg",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/CinGG-20240229-x86_64.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "20240229",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "appimageupdatetool-f82f1d42bfa0915322abb8cb8f1bc5ae",
+    "nombre": "Appimageupdatetool F82f1d42bfa0915322abb8cb8f1bc5ae",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Appimageupdatetool F82f1d42bfa0915322abb8cb8f1bc5ae",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/appimageupdatetool-x86_64_f82f1d42bfa0915322abb8cb8f1bc5ae.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "giada",
+    "nombre": "Giada",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Giada",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/Giada-0.15.4-x86_64.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "0.15.4",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "gimp-appimage-git-withplugins",
+    "nombre": "Gimp Appimage Git Withplugins",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Gimp Appimage Git Withplugins",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/GIMP_AppImage-git-2.10.25-20210610-withplugins-x86_64.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "2.10.25",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "bella-durmiente",
+    "nombre": "Bella Durmiente",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Bella Durmiente",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/bella-durmiente.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "detective8",
+    "nombre": "Detective8",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Detective8",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/detective8.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "etecsa2014",
+    "nombre": "Etecsa2014",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Etecsa2014",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/Etecsa2014.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "libreoffice-es",
+    "nombre": "Libreoffice Es",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Libreoffice Es",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/LibreOffice-7.3.1.es-x86_64.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "7.3.1",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "chromium-108",
+    "nombre": "Chromium 108",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Chromium 108",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/Chromium-108.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "cool-retro-term-54a6a7f",
+    "nombre": "Cool Retro Term 54a6a7f",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Cool Retro Term 54a6a7f",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/Cool_Retro_Term-54a6a7f-x86_64.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "deskreen",
+    "nombre": "Deskreen",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Deskreen",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/Deskreen-1.0.12.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "1.0.12",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "killswitch",
+    "nombre": "Killswitch",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Killswitch",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/killswitch.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "olly-debug",
+    "nombre": "Olly Debug",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Olly Debug",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/Olly-Debug.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "hoverclock",
+    "nombre": "Hoverclock",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Hoverclock",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/Hoverclock-x86_64.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "freedownloadmanager",
+    "nombre": "Freedownloadmanager",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Freedownloadmanager",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/freedownloadmanager-6.15.3.4236-x86_64.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "6.15.3.4236",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "dvdstyler",
+    "nombre": "Dvdstyler",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Dvdstyler",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/dvdstyler.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "appimage-builder",
+    "nombre": "Appimage Builder",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Appimage Builder",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/appimage-builder-1.0.2-x86_64.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "1.0.2",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "wine-parajuegos",
+    "nombre": "Wine Parajuegos",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Wine Parajuegos",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/wine-parajuegos.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "audacity-9789fe756269ada948b4d36189fa2a58",
+    "nombre": "Audacity 9789fe756269ada948b4d36189fa2a58",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Audacity 9789fe756269ada948b4d36189fa2a58",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/audacity-linux-3.1.3-x86_64_9789fe756269ada948b4d36189fa2a58.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "3.1.3",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "stormworm2",
+    "nombre": "Stormworm2",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Stormworm2",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/stormworm2.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "outlook",
+    "nombre": "Outlook",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Outlook",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/Outlook-2007.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "chromium-web-browser-1-deb12u1",
+    "nombre": "Chromium Web Browser 1 Deb12u1",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Chromium Web Browser 1 Deb12u1",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/Chromium_Web_Browser-126.0.6478.56-1.deb12u1-x86_64.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "126.0.6478.56",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "stormworm3",
+    "nombre": "Stormworm3",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Stormworm3",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/StormWorm3.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "opera-beta78",
+    "nombre": "Opera Beta78",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Opera Beta78",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/Opera-Beta78.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "wormsfort",
+    "nombre": "Wormsfort",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Wormsfort",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/wormsFort.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "telegram",
+    "nombre": "Telegram",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Telegram",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/Telegram.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "libreoffice7-3",
+    "nombre": "Libreoffice7 3",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Libreoffice7 3",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/LibreOffice7.3.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "7.3",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "firefox105-en",
+    "nombre": "Firefox105 En",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Firefox105 En",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/Firefox105-EN.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "deb2appimage",
+    "nombre": "Deb2appimage",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Deb2appimage",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/deb2appimage-0.0.5-x86_64.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "0.0.5",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "chromium-glibc2-17",
+    "nombre": "Chromium Glibc2 17",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Chromium Glibc2 17",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/Chromium-104.0.5093.0.glibc2.17-x86_64.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "104.0.5093.0",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "wine-staging",
+    "nombre": "Wine Staging",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Wine Staging",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/wine-staging_7.18-x86_64.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "7.18",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "harrypot-2-camara",
+    "nombre": "Harrypot 2 Camara",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Harrypot 2 Camara",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/HarryPot-2-Camara.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "word2007",
+    "nombre": "Word2007",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Word2007",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/Word2007.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "appimagetool-709-version-go",
+    "nombre": "Appimagetool 709 Version Go",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Appimagetool 709 Version Go",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/appimagetool-709-version-go-x86_64.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "promesario",
+    "nombre": "Promesario",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Promesario",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/promesario.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "mupdf-for-terminal",
+    "nombre": "Mupdf For Terminal",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Mupdf For Terminal",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/Mupdf-for-terminal.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "adobeaudition1-0",
+    "nombre": "Adobeaudition1 0",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Adobeaudition1 0",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/AdobeAudition1.0-x86_64.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "1.0",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "access",
+    "nombre": "Access",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Access",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/ACCESS-2007.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "atom",
+    "nombre": "Atom",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Atom",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/Atom-x86_64.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "appimageupdate-5d6fe9c394b2067a5c73f6976734292b",
+    "nombre": "Appimageupdate 5d6fe9c394b2067a5c73f6976734292b",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Appimageupdate 5d6fe9c394b2067a5c73f6976734292b",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/AppImageUpdate-x86_64_5d6fe9c394b2067a5c73f6976734292b.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "academiacocina",
+    "nombre": "Academiacocina",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Academiacocina",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/academiacocina.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "blender",
+    "nombre": "Blender",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Blender",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/Blender-3.3.0-x86_64.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "3.3.0",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "android-studio",
+    "nombre": "Android Studio",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Android Studio",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/Android-Studio.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "pkg2appimage-1807",
+    "nombre": "Pkg2appimage 1807",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Pkg2appimage 1807",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/pkg2appimage-1807-x86_64.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "bugdom",
+    "nombre": "Bugdom",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Bugdom",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/Bugdom-1.3.1-linux-x86_64.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "1.3.1",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "lmms",
+    "nombre": "Lmms",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Lmms",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/lmms-1.2.2-linux-x86_64.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "1.2.2",
+    "update_available": false
+  }
+,
+  {
+    "estado": "A",
+    "id": "hitman2",
+    "nombre": "Hitman2",
+    "remoto": "archive.org",
+    "descripcion": "Aplicación AppImage: Hitman2",
+    "icono": "/usr/local/essora-store/icons/app_appimage.png",
+    "url": "https://archive.org/download/appimage/hitman2.AppImage",
+    "installed": false,
+    "installed_version": "",
+    "available_version": "",
+    "update_available": false
+  }
+]
