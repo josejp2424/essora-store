@@ -648,20 +648,52 @@ class ActivityManager:
             GLib.idle_add(self.gui.on_activity_done, tr("Error updating Flatpak packages"))
     
     def _update_all_deb(self):
-        """Update all DEB packages with progress dialog"""
         from gi.repository import GLib
-        
+
+        # #agregado por josejp2424 — env noninteractive para todo el proceso
+        env = os.environ.copy()
+        env["DEBIAN_FRONTEND"] = "noninteractive"
+
         GLib.idle_add(self.gui.show_progress_dialog, tr("Updating all DEB packages"), "deb")
-        
+
+        # #agregado por josejp2424 — pre-responder preguntas de grub-pc y grub-efi
+        # para que no queden esperando input aunque DEBIAN_FRONTEND=noninteractive
+        try:
+            grub_disk = ""
+            try:
+                import subprocess as _sp
+                result = _sp.run(
+                    ["grub-probe", "--target=disk", "/boot"],
+                    stdout=_sp.PIPE, stderr=_sp.DEVNULL, text=True, timeout=5
+                )
+                grub_disk = result.stdout.strip()
+            except Exception:
+                pass
+
+            if grub_disk:
+                selections = (
+                    f"grub-pc grub-pc/install_devices multiselect {grub_disk}\n"
+                    f"grub-pc grub-pc/install_devices_disks_changed multiselect {grub_disk}\n"
+                    f"grub-efi-amd64 grub2/update_nvram boolean true\n"
+                )
+                _sp.run(
+                    ["debconf-set-selections"],
+                    input=selections, text=True,
+                    stdout=_sp.DEVNULL, stderr=_sp.DEVNULL,
+                    env=env, timeout=10
+                )
+        except Exception:
+            pass
 
         GLib.idle_add(self.gui.update_progress_text, tr("Updating package lists..."))
-        
+
         p1 = subprocess.Popen(
             ["apt-get", "update"],
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             text=True,
-            bufsize=1
+            bufsize=1,
+            env=env
         )
         
         for line in iter(p1.stdout.readline, ''):
@@ -682,16 +714,17 @@ class ActivityManager:
         fd_r, fd_w = os.pipe()
         p2 = subprocess.Popen(
             [
-                "apt-get", "upgrade", "-y", 
+                "apt-get", "upgrade", "-y",
                 f"-o=APT::Status-Fd={fd_w}",
+                "-o", "Dpkg::Options::=--force-confold",  # conservar config ISO
                 "-o", "Dpkg::Options::=--force-confdef",
-                "-o", "Dpkg::Options::=--force-confold"
             ],
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             text=True,
             bufsize=1,
-            pass_fds=(fd_w,)
+            pass_fds=(fd_w,),
+            env=env
         )
         os.close(fd_w)
         
