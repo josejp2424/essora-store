@@ -3,7 +3,7 @@
   <h1>Essora Store</h1>
   <p><strong>Unified package manager for Essora Linux — Flatpak, DEB and AppImage in one place.</strong></p>
 
-  ![Version](https://img.shields.io/badge/version-3.3--1-blue)
+  ![Version](https://img.shields.io/badge/version-3.6--1-blue)
   ![License](https://img.shields.io/badge/license-GPL--3.0-green)
   ![Platform](https://img.shields.io/badge/platform-Essora%20Linux-purple)
   ![GTK](https://img.shields.io/badge/GTK-3.0-orange)

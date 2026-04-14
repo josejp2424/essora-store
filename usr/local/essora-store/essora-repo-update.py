@@ -43,6 +43,18 @@ TRANSLATIONS = {
         'message_no_internet': 'Sin conexión a internet, iniciando Essora Store...',
         'message_icons': 'Actualizando caché de iconos...'
     },
+    'de': {
+        'title': 'Bitte warten',
+        'message': 'Repositories werden aktualisiert...',
+        'message_no_internet': 'Keine Internetverbindung, Essora Store wird gestartet...',
+        'message_icons': 'Icon-Cache wird aktualisiert...'
+    },
+    'ar': {
+        'title': 'يرجى الانتظار',
+        'message': 'جارٍ تحديث المستودعات...',
+        'message_no_internet': 'لا يوجد اتصال بالإنترنت، جارٍ تشغيل Essora Store...',
+        'message_icons': 'جارٍ تحديث ذاكرة التخزين المؤقت للأيقونات...'
+    },
     'ca': {
         'title': 'Si us plau, espereu',
         'message': 'Actualitzant repositoris...',
@@ -247,50 +259,53 @@ class RepoUpdaterWindow(Gtk.Window):
     
     def run_appropriate_commands(self):
         """Execute commands based on internet connection"""
-        try:
-            if self.has_internet:
-                self.processes = []
-                
-                # Proceso 1: appimage
-                proc1 = subprocess.Popen(['/usr/local/essora-store/appimage'], 
-                                        stdout=subprocess.DEVNULL, 
-                                        stderr=subprocess.DEVNULL,
-                                        start_new_session=True)  
-                self.processes.append(proc1)
-                
-                # Proceso 2: deb db
-                proc2 = subprocess.Popen(['/usr/local/essora-store/essora-deb-db'], 
-                                        stdout=subprocess.DEVNULL, 
-                                        stderr=subprocess.DEVNULL,
-                                        start_new_session=True)
-                self.processes.append(proc2)
-                
-                # Proceso 3: flatpak db
-                proc3 = subprocess.Popen(['/usr/local/essora-store/gen-flatpak-db'], 
-                                        stdout=subprocess.DEVNULL, 
-                                        stderr=subprocess.DEVNULL,
-                                        start_new_session=True)
-                self.processes.append(proc3)                                
-                icon_thread = threading.Thread(target=self.run_icon_script)
-                icon_thread.daemon = True
-                icon_thread.start()
-                
-                for proc in self.processes:
-                    try:
-                        proc.wait(timeout=30)  
-                    except subprocess.TimeoutExpired:
-                        print(f"Process {proc.pid} timed out")
-                        proc.kill()
-                
-                icon_thread.join(timeout=5)
-                
+        if self.has_internet:
+            t = threading.Thread(target=self._run_updates_thread, daemon=True)
+            t.start()
+        else:
             GLib.timeout_add(500, self.launch_essora_store)
-                
-        except Exception as e:
-            print(f"Error during process: {e}", file=sys.stderr)
-            GLib.timeout_add(500, self.launch_essora_store)
-        
         return False
+
+    def _run_updates_thread(self):
+        """Corre los 3 scripts + icons en background sin congelar la GUI"""
+        try:
+            self.processes = []
+
+            proc1 = subprocess.Popen(['/usr/local/essora-store/appimage'],
+                                     stdout=subprocess.DEVNULL,
+                                     stderr=subprocess.DEVNULL,
+                                     start_new_session=True)
+            self.processes.append(proc1)
+
+            proc2 = subprocess.Popen(['/usr/local/essora-store/essora-deb-db'],
+                                     stdout=subprocess.DEVNULL,
+                                     stderr=subprocess.DEVNULL,
+                                     start_new_session=True)
+            self.processes.append(proc2)
+
+            proc3 = subprocess.Popen(['/usr/local/essora-store/gen-flatpak-db'],
+                                     stdout=subprocess.DEVNULL,
+                                     stderr=subprocess.DEVNULL,
+                                     start_new_session=True)
+            self.processes.append(proc3)
+
+            icon_thread = threading.Thread(target=self.run_icon_script, daemon=True)
+            icon_thread.start()
+
+            timeouts = [180, 60, 60]
+            for proc, timeout in zip(self.processes, timeouts):
+                try:
+                    proc.wait(timeout=timeout)
+                except subprocess.TimeoutExpired:
+                    print(f"Process {proc.pid} timed out, killing")
+                    proc.kill()
+
+            icon_thread.join(timeout=10)
+
+        except Exception as e:
+            print(f"Error during updates: {e}", file=sys.stderr)
+
+        GLib.idle_add(lambda: GLib.timeout_add(500, self.launch_essora_store))
     
     def launch_essora_store(self):
         """Launch Essora Store and close this window"""
@@ -312,7 +327,6 @@ class RepoUpdaterWindow(Gtk.Window):
         except Exception as e:
             print(f"Error launching Essora Store: {e}", file=sys.stderr)
         
-        # Cerrar esta ventana
         self.destroy()
         return False
 

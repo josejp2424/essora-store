@@ -15,18 +15,30 @@ JSON_FILE="/usr/local/essora-store/appimage-store.json"
 ICON_CACHE_DIR="/usr/local/essora-store/icons/appimage"
 FALLBACK_ICON="/usr/local/essora-store/icons/app_appimage.png"
 FEED_URL="https://appimage.github.io/feed.json"
-ICON_BASE_URL="https://appimage.github.io/database"
 GITHUB_API="https://api.github.com/repos"
 
 APPIMAGE_DIR_USER="${HOME}/Applications"
 APPIMAGE_ROOT_SYSTEM="/opt/appimage"
 
+LAST_UPDATE_FILE="/usr/local/essora-store/last-update.txt"
 FEED_CACHE="/tmp/appimage_feed_$$.json"
 trap 'rm -f "$FEED_CACHE"' EXIT
 
 mkdir -p "$(dirname "$JSON_FILE")" "$APPIMAGE_DIR_USER" "$ICON_CACHE_DIR" 2>/dev/null || true
 
-echo "== Essora Store: generando appimage-store.json =="
+echo "== Essora Store: AppImage list =="
+
+# ── Check fecha: si ya se actualizó hoy y el JSON existe, salir ───────────────
+TODAY=$(date +%Y-%m-%d)
+if [[ -f "$LAST_UPDATE_FILE" && -s "$JSON_FILE" ]]; then
+  LAST=$(cat "$LAST_UPDATE_FILE" | tr -d '[:space:]')
+  if [[ "$LAST" == "$TODAY" ]]; then
+    echo "✔ Catálogo al día ($TODAY) — sin cambios necesarios."
+    exit 0
+  fi
+fi
+
+echo "Actualizando catálogo…"
 
 # ── Descarga ──────────────────────────────────────────────────────────────────
 download_feed() {
@@ -41,44 +53,21 @@ download_feed() {
   fi
 }
 
-# ── Ícono por app ─────────────────────────────────────────────────────────────
-# El feed.json tiene "icons": ["NombreApp/icons/512x512/app.png"]
-# URL completa: https://appimage.github.io/database/NombreApp/icons/...
 get_icon() {
-  local icon_rel="$1"   # ej: "86Box/icons/512x512/86box.png"
-  local app_id="$2"
-
-  [[ -z "$icon_rel" ]] && echo "$FALLBACK_ICON" && return
-
-  local ext="${icon_rel##*.}"
-  local cache_file="$ICON_CACHE_DIR/${app_id}.${ext}"
-
-  # Si ya está cacheado, devolver ruta
-  if [[ -f "$cache_file" ]]; then
-    echo "$cache_file"
-    return
-  fi
-
-  local icon_url="${ICON_BASE_URL}/${icon_rel}"
-
-  # Descargar silenciosamente; si falla usar fallback
-  if command -v curl >/dev/null 2>&1; then
-    curl -fsSL --max-time 10 "$icon_url" -o "$cache_file" 2>/dev/null || { rm -f "$cache_file"; echo "$FALLBACK_ICON"; return; }
-  else
-    wget -q --timeout=10 "$icon_url" -O "$cache_file" 2>/dev/null || { rm -f "$cache_file"; echo "$FALLBACK_ICON"; return; }
-  fi
-
-  echo "$cache_file"
+  local app_id="$1"
+  for ext in png svg jpg; do
+    if [[ -f "$ICON_CACHE_DIR/${app_id}.${ext}" ]]; then
+      echo "$ICON_CACHE_DIR/${app_id}.${ext}"
+      return
+    fi
+  done
+  echo "$FALLBACK_ICON"
 }
 
-# ── Obtener URL de descarga del último release en GitHub ──────────────────────
-# El feed tiene "links": [{"type":"GitHub","url":"owner/repo"}, {"type":"Download","url":"..."}]
-# Usamos "Download" directo si existe; si no, GitHub API para el último .AppImage
 get_download_url() {
-  local github_path="$1"   # ej: "86Box/86Box"
-  local direct_url="$2"    # URL de Download del feed (puede ser "")
-
-  # Si el feed ya da URL directa de releases, usarla
+  local github_path="$1"   
+  local direct_url="$2"   
+  
   if [[ -n "$direct_url" ]]; then
     echo "$direct_url"
     return
@@ -86,7 +75,7 @@ get_download_url() {
 
   [[ -z "$github_path" ]] && echo "" && return
 
-  # Intentar GitHub API (sin auth, rate-limited a 60 req/h)
+
   local api_url="${GITHUB_API}/${github_path}/releases/latest"
   local rel_json
   if command -v curl >/dev/null 2>&1; then
@@ -95,14 +84,12 @@ get_download_url() {
     rel_json=$(wget -q --timeout=10 -O- "$api_url" 2>/dev/null || echo "")
   fi
 
-  # Buscar primer .AppImage en assets
   local dl_url
   dl_url=$(echo "$rel_json" | grep -o '"browser_download_url":"[^"]*\.AppImage"' | head -n1 | cut -d'"' -f4 || true)
 
   echo "$dl_url"
 }
 
-# ── Versión instalada ─────────────────────────────────────────────────────────
 find_installed_path() {
   local app_id="$1"
   local p1="$APPIMAGE_ROOT_SYSTEM/$app_id/$app_id.AppImage"
@@ -130,7 +117,6 @@ normalize_id() {
   echo "$1" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g; s/--*/-/g; s/^-//; s/-$//'
 }
 
-# ── Main ──────────────────────────────────────────────────────────────────────
 download_feed
 
 if [[ ! -s "$FEED_CACHE" ]]; then
@@ -138,7 +124,6 @@ if [[ ! -s "$FEED_CACHE" ]]; then
   exit 1
 fi
 
-# Verificar que jq esté disponible (necesario para parsear el feed JSON)
 if ! command -v jq >/dev/null 2>&1; then
   echo "ERROR: 'jq' es requerido para parsear el feed. Instalar con: apt-get install jq" >&2
   exit 1
@@ -153,37 +138,28 @@ total=0
 installed_count=0
 upd_count=0
 
-# Iterar cada item del feed
+
 while IFS= read -r item; do
   name=$(echo "$item" | jq -r '.name // ""')
   [[ -z "$name" ]] && continue
 
-  # Descripción (puede ser null)
-  desc=$(echo "$item" | jq -r '.description // ""' | sed 's/<[^>]*>//g' | tr -d '\n' | sed 's/"/\\"/g')
+  desc=$(echo "$item" | jq -r '.description // ""' | sed 's/<[^>]*>//g' | tr -d '\n\t\r' | sed 's/"/\\"/g')
   [[ -z "$desc" ]] && desc="AppImage: $name"
 
-  # Categoría
   category=$(echo "$item" | jq -r '.categories[0] // "Utility"')
 
-  # Ícono (primer elemento del array)
-  icon_rel=$(echo "$item" | jq -r '.icons[0] // ""')
-
-  # Links
   github_path=$(echo "$item" | jq -r '.links[] | select(.type=="GitHub") | .url' 2>/dev/null | head -n1 || echo "")
   direct_dl=$(echo "$item" | jq -r '.links[] | select(.type=="Download") | .url' 2>/dev/null | head -n1 || echo "")
 
   app_id=$(normalize_id "$name")
   [[ -z "$app_id" ]] && continue
 
-  # Ícono: descargar si no está cacheado
-  icon_path=$(get_icon "$icon_rel" "$app_id")
+  icon_path=$(get_icon "$app_id")
 
-  # URL de descarga
   download_url=$(get_download_url "$github_path" "$direct_dl")
-  # Si no hay URL de descarga directa, usar la página de releases de GitHub
+
   [[ -z "$download_url" && -n "$github_path" ]] && download_url="https://github.com/${github_path}/releases/latest"
 
-  # Estado instalado
   inst_path=$(find_installed_path "$app_id")
   installed=false
   estado="A"
@@ -203,7 +179,6 @@ while IFS= read -r item; do
     fi
   fi
 
-  # Escapar campos para JSON
   name_j=${name//\\/\\\\}; name_j=${name_j//\"/\\\"}
   desc_j=${desc//\\/\\\\}; desc_j=${desc_j//\"/\\\"}
   icon_j=${icon_path//\\/\\\\}; icon_j=${icon_j//\"/\\\"}
@@ -235,6 +210,8 @@ EOF
 done < <(jq -c '.items[]' "$FEED_CACHE")
 
 echo "]" >> "$JSON_FILE"
+
+echo "$TODAY" > "$LAST_UPDATE_FILE"
 
 echo ""
 echo "✔ Generado: $JSON_FILE"
