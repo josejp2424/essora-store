@@ -176,7 +176,32 @@ The launcher script handles `pkexec` elevation so APT operations have the necess
 
 ## Screenshots
 
-> Screenshots coming soon.
+<div align="center">
+
+**Home Screen**
+<img src="assets/store.png" alt="Essora Store — Home" width="780"/>
+
+---
+
+**Flatpak**
+<img src="assets/store-flatpak.png" alt="Essora Store — Flatpak" width="780"/>
+
+---
+
+**DEB / APT**
+<img src="assets/store-deb.png" alt="Essora Store — DEB" width="780"/>
+
+---
+
+**AppImage**
+<img src="assets/store-appimage.png" alt="Essora Store — AppImage" width="780"/>
+
+---
+
+**Fix Broken Packages**
+<img src="assets/store-fixbroken.png" alt="Essora Store — Fix Broken" width="780"/>
+
+</div>
 
 ---
 
