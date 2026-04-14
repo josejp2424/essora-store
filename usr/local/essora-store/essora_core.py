@@ -1035,13 +1035,54 @@ class ActivityManager:
         GLib.idle_add(self.gui.hide_progress_dialog)
 
 
+    def _resolve_appimage_url(self, app: Application) -> str:
+        """Resuelve la URL directa del .AppImage.
+        Si la URL es una página de releases de GitHub, consulta la API
+        para obtener el primer asset .AppImage del último release."""
+        url = app.download_url or ""
+
+        # URL directa a un archivo — usar tal cual
+        if url.lower().endswith(".appimage"):
+            return url
+
+        # URL de página de releases — resolver via GitHub API
+        github = getattr(app, "remote", "") or ""
+        # el campo github está en download_url como https://github.com/owner/repo/releases
+        # o en el campo 'remote' como 'appimage.github.io'
+        # Extraer owner/repo de la URL
+        import re as _re
+        m = _re.search(r"github\.com/([^/]+/[^/]+?)(?:/releases.*)?$", url)
+        if not m and hasattr(app, "download_url"):
+            m = _re.search(r"github\.com/([^/]+/[^/]+?)(?:/releases.*)?$", app.download_url or "")
+
+        if m:
+            repo_path = m.group(1)
+            api_url = f"https://api.github.com/repos/{repo_path}/releases/latest"
+            try:
+                import urllib.request, json as _json
+                req = urllib.request.Request(api_url, headers={"User-Agent": "essora-store"})
+                with urllib.request.urlopen(req, timeout=10) as resp:
+                    data = _json.loads(resp.read())
+                assets = data.get("assets", [])
+                # Preferir x86_64 AppImage
+                for asset in assets:
+                    name = asset.get("name", "")
+                    if name.endswith(".AppImage") and "x86_64" in name:
+                        return asset["browser_download_url"]
+                # Cualquier AppImage
+                for asset in assets:
+                    if asset.get("name", "").endswith(".AppImage"):
+                        return asset["browser_download_url"]
+            except Exception as e:
+                print(f"[AppImage] GitHub API error for {repo_path}: {e}")
+
+        # Fallback: devolver la URL original (puede fallar pero al menos muestra el error)
+        return url
+
     def _install_appimage(self, app: Application):
         from gi.repository import GLib
         
-        if app.download_url:
-            url = app.download_url
-        else:
-            url = f"{APPIMAGE_ARCHIVE_URL}/{app.app_id}.AppImage"
+        url = self._resolve_appimage_url(app)
 
         target_dir = APPIMAGE_ROOT / app.app_id
         target_dir.mkdir(parents=True, exist_ok=True)
