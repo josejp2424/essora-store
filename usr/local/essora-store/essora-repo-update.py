@@ -271,12 +271,6 @@ class RepoUpdaterWindow(Gtk.Window):
         try:
             self.processes = []
 
-            proc1 = subprocess.Popen(['/usr/local/essora-store/appimage'],
-                                     stdout=subprocess.DEVNULL,
-                                     stderr=subprocess.DEVNULL,
-                                     start_new_session=True)
-            self.processes.append(proc1)
-
             proc2 = subprocess.Popen(['/usr/local/essora-store/essora-deb-db'],
                                      stdout=subprocess.DEVNULL,
                                      stderr=subprocess.DEVNULL,
@@ -292,7 +286,7 @@ class RepoUpdaterWindow(Gtk.Window):
             icon_thread = threading.Thread(target=self.run_icon_script, daemon=True)
             icon_thread.start()
 
-            timeouts = [180, 60, 60]
+            timeouts = [60, 60]
             for proc, timeout in zip(self.processes, timeouts):
                 try:
                     proc.wait(timeout=timeout)

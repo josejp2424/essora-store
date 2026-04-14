@@ -1,14 +1,13 @@
-# formato: ESTADO|ID|NOMBRE|REMOTO|DESCRIPCION|INSTALLED_VER|AVAILABLE_VER|UPDATE
-# ESTADO: I = instalado, A = disponible
-# UPDATE: 1 = hay actualización, 0 = no
+# format: STATE|ID|NAME|REMOTE|DESCRIPTION|INSTALLED_VER|AVAILABLE_VER|UPDATE
+# STATE: I = installed, A = available
+# UPDATE: 1 = update available, 0 = no
 A|ai.jan.Jan|Jan|flathub|Private offline AI assistant||0.7.5|0
-I|app.authpass.AuthPass|AuthPass|flathub|Password Manager: Keep your passwords safe across all platforms and devices|1.9.6_1904|1.9.6_1904|0
+A|app.authpass.AuthPass|AuthPass|flathub|Password Manager: Keep your passwords safe across all platforms and devices||1.9.6_1904|0
 A|app.bbsync.BlackboardSync|Blackboard Sync|flathub|Descarga contenido de Blackboard Learn||0.18.0|0
 A|app.bluebubbles.BlueBubbles|BlueBubbles|flathub|BlueBubbles client for Linux||1.15.4.0|0
 A|app.cantara.Cantara|Cantara|flathub|Song Presentation in Churches||2.6.0|0
 A|app.comaps.comaps|comaps|flathub|stable|||0
 A|app.curocalc.calculator|Curo Calculator|flathub|Financial calculations simplified||2.3.0|0
-A|app.devsuite.Manuals|Manuales|flathub|Leer la documentación del desarrollador||49.1|0
 A|app.devsuite.Ptyxis|Ptyxis|flathub|Terminal orientada al trabajo con contenedores||49.2|0
 A|app.devsuite.Schemes|Schemes|flathub|Create syntax highlighting schemes||46.0|0
 A|app.drey.Biblioteca|Biblioteca|flathub|Read GNOME documentation offline||1.7|0
@@ -19,10 +18,10 @@ A|app.drey.EarTag|Ear Tag|flathub|Editar etiquetas de archivos de audio||1.0.2|0
 A|app.drey.Elastic|Elastic|flathub|Diseñar animaciones spring||1.0.1|0
 A|app.drey.KeyRack|Key Rack|flathub|View and edit passwords||0.4.0|0
 A|app.drey.MultiplicationPuzzle|Rompecabezas de multiplicaciones|flathub|Resuelva un misterio matemático||15.0|0
-A|app.drey.Typewriter|Typewriter|flathub|Compose documents faster||0.1.0|0
 A|app.drey.Warp|Warp|flathub|Transferencia de archivos rápida y segura||0.9.2|0
 A|app.eduroam.geteduroam|geteduroam|flathub|A geteduroam client for Linux. Geteduroam simplifies the process of connecting to eduroam||0.12|0
 A|app.feeddeck.feeddeck|FeedDeck|flathub|Feed reader||v1.4.1|0
+A|app.fluxer.Fluxer|Fluxer|flathub|stable|||0
 A|app.fotema.Fotema|Fotema|flathub|Admire your photos||2.4.0|0
 A|app.freelens.Freelens|Freelens|flathub|Free IDE for Kubernetes||1.7.0|0
 A|app.getclipboard.Clipboard|Clipboard|flathub|Cut, copy, and paste anything, anytime, anywhere||0.9.1|0
@@ -31,6 +30,7 @@ A|app.go2tv.go2tv|Go2TV|flathub|Stream media to TVs and devices||1.19.0|0
 A|app.grayjay.Grayjay|Grayjay|flathub|Universal media aggregator||12|0
 A|app.gummi.gummi|Gummi|flathub|The simple LaTeX editor||0.8.3|0
 A|app.katvan.Katvan|Katvan|flathub|Editor for Typst files, with a bias for Right-to-Left||0.12.0|0
+A|app.kreya.Kreya|Kreya|flathub|stable|||0
 A|app.lith.Lith|Lith|flathub|WeeChat Relay Client||v1.6.5|0
 A|app.logorrr.LogoRRR|LogoRRR|flathub|Log files at a glance - a log viewer which is simple to use!||25.2.0|0
 A|app.moosync.moosync|Moosync|flathub|Customizable music player||11.0.2|0
@@ -66,7 +66,6 @@ A|be.alexandervanhee.gradia|Gradia|flathub|Anote sus capturas de pantalla||1.11.
 A|best.ellie.StartupConfiguration|Startup Configuration|flathub|View and set startup scripts and applications||1.0.1|0
 A|br.app.pw3270.terminal|pw3270|flathub|Access TN3270 hosts||5.5.0|0
 A|br.com.eduk.school|eduK|flathub|eduK is an educational web platform focused on assisting users in income generation||0.0.1|0
-A|br.com.gualandi.Xjump|Xjump|flathub|A jumping game for modern graphical systems||3.0.4|0
 A|br.com.wiselabs.simplexity|Simplexity|flathub|Simple desktop app for Perplexity.AI||1.0.1|0
 A|br.eng.silas.qpdftools|Qpdf Tools|flathub|Tool for managing PDFs||3.1.2|0
 A|br.gov.cti.invesalius|InVesalius|flathub|3D medical imaging reconstruction software||3.1.999982|0
@@ -77,6 +76,7 @@ A|br.gov.fazenda.receita.irpf2022|IRPF 2022|flathub|Do your taxes in Brazil (Cal
 A|br.gov.fazenda.receita.irpf2023|IRPF 2023|flathub|Do your taxes in Brazil (Calendar year of 2022)||1.8|0
 A|br.gov.fazenda.receita.irpf2024|IRPF 2024|flathub|Do your taxes in Brazil (Calendar year of 2023)||1.8|0
 A|br.gov.fazenda.receita.irpf2025|IRPF 2025|flathub|Do your taxes in Brazil (Calendar year of 2024)||1.7|0
+A|br.gov.fazenda.receita.irpf2026|irpf2026|flathub|stable|||0
 A|ca._0ldsk00l.Nestopia|Nestopia|flathub|Nintendo Entertainment System emulator||1.53.2|0
 A|ca.desrt.dconf-editor|Editor de dconf|flathub|Una herramienta gráfica para editar la base de datos de dconf||49.0|0
 A|ca.edestcroix.Recordbox|Recordbox|flathub|Explora y reproduce tu música local||0.10.4|0
@@ -196,6 +196,7 @@ A|com.blockstream.Green|Blockstream Green|flathub|A simple and secure Bitcoin an
 A|com.blunix.currency_converter|Currency Converter|flathub|An app for converting currencies||1.0.1|0
 A|com.borgbase.Vorta|Vorta|flathub|Backup client||v0.11.1|0
 A|com.boxy_svg.BoxySVG|Boxy SVG|flathub|Editor de gráficos vectoriales||4.95.0|0
+A|com.brainscanmedia.SafeScript|SafeScript|flathub|stable|||0
 A|com.brave.Browser|Brave|flathub|Fast Internet, AI, Adblock||1.85.118|0
 A|com.budgetwithbuckets.Buckets|Buckets|flathub|Quick, simple and private family budgeting app||0.80.0|0
 A|com.calibre_ebook.calibre|calibre|flathub|La solución integral a todas sus necesidades con los libros electrónicos||8.16.2|0
@@ -227,11 +228,11 @@ A|com.darhon.syncbackup|syncBackup|flathub|Backup and mirror your drives||2.1.4|
 A|com.dec05eba.gpu_screen_recorder|GPU Screen Recorder|flathub|A shadowplay-like screen recorder for Linux. The fastest screen recorder for Linux||5.11.1|0
 A|com.devolutions.remotedesktopmanager|Remote Desktop Manager|flathub|Centralize, Manage and Secure Remote Connections||2025.3.1.1|0
 A|com.diffingo.fwbackups|fwbackups|flathub|A feature-rich, user-friendly backup program||1.43.8-rc4|0
-A|com.dingtalk.DingTalk|DingTalk|flathub|An intelligent working platform||7.6.45.5062501|0
 A|com.discordapp.Discord|Discord|flathub|Talk, play, hang out||0.0.119|0
 A|com.diy_fever.DIYLayoutCreator|DIY Layout Creator|flathub|Circuit layout design tool supporting PCB, vero-board, point-to-point, perf-board and guitar wiring diagrams||4.39.0|0
 A|com.djoffe.gnukem|Dave Gnukem|flathub|Retro-style 2D scrolling platform shooter||1.0.3|0
 A|com.donhopkins.Micropolis|Micropolis|flathub|City building game||4.0|0
+A|com.dosbox.DOSBox|DOSBox|flathub|stable|||0
 A|com.dosbox_x.DOSBox-X|DOSBox-X|flathub|x86/DOS emulator with sound and graphics||2025.12.01|0
 A|com.doycho.euterpe.gtk|Euterpe|flathub|Audio player for the Euterpe media server||0.8.1|0
 A|com.dreamsourcelab.DSView|DSView|flathub|An open source multi-function instrument for everyone||1.3.2|0
@@ -266,9 +267,10 @@ A|com.fanuriotimetracking.fanurio|fanurio|flathub|stable|||0
 A|com.fastmail.Fastmail|Fastmail|flathub|Email made better||1.0.6|0
 A|com.feaneron.Boatswain|Boatswain|flathub|Controle sus controladoras Elgato||5.0|0
 A|com.felipekinoshita.Kana|Kana|flathub|Learn Japanese characters||1.4|0
-A|com.felipekinoshita.Wildcard|Wildcard|flathub|Prueba tus expresiones regulares||0.3.3|0
 A|com.fightcade.Fightcade|Fightcade|flathub|Play arcade games online||2.4.1|0
 A|com.flashforge.FlashPrint|FlashPrint|flathub|Slicer for the FlashForge 3D printers||5.8.7|0
+A|com.flow_browser.flow|flow|flathub|stable|||0
+A|com.fogpanther.FogPanther|FogPanther|flathub|stable|||0
 A|com.frac_tion.teleport|Teleport|flathub|Share files over the local network||0.0.1|0
 A|com.francescogaglione.chronos|Chronos|flathub|Chronos is a simple and intuitive Pomodoro timer for Linux||0.1.5|0
 A|com.francescogaglione.cosmicmoney|Cosmic money|flathub|Simple money manager||0.4.0|0
@@ -279,6 +281,7 @@ A|com.geekbench.Geekbench6|Geekbench 6|flathub|Cross-platform system benchmark||
 A|com.geeks3d.furmark|FurMark|flathub|OpenGL and Vulkan GPU stress test||2.10.2.0|0
 A|com.georgefb.mangareader|Manga Reader|flathub|Manga Reader for local files||2.2.2|0
 A|com.georgefb.quickaccess|QuickAccess|flathub|A global menu giving you quick access to folders and custom commands.||3.2.0|0
+A|com.gesturedevelop.AirSQLiteManager|AirSQLiteManager|flathub|stable|||0
 A|com.getmailspring.Mailspring|Mailspring|flathub|The best email app for people and teams at work||1.14.0|0
 A|com.getpostman.Postman|Postman|flathub|Platform for building and using APIs||11.77.2|0
 A|com.giadamusic.Giada|Giada|flathub|Your hardcore loop machine||1.4.0|0
@@ -346,7 +349,6 @@ A|com.github.flxzt.rnote|Rnote|flathub|Dibujar y tomar notas a mano||0.13.1|0
 A|com.github.fontmatrix.Fontmatrix|Fontmatrix|flathub|Font management application||0.9.100|0
 A|com.github.gabutakut.gabutdm|Gabut Download Manager|flathub|Simple and Fast Download Manager||2.7.0|0
 A|com.github.geigi.cozy|Cozy|flathub|Listen to audio books||1.3.0|0
-A|com.github.giacomogroppi.writernote-qt|Writernote|flathub|Writernote is a multiplatform application that allows you to take notes by recording audio, translate it later into text, and listen to it in an intelligent way.||4.0.5h|0
 A|com.github.gijsgoudzwaard.image-optimizer|Image Optimizer|flathub|Simple lossless image compression||0.1.25|0
 A|com.github.git_cola.git-cola|Git Cola|flathub|Sleek and powerful Git GUI||4.16.1|0
 A|com.github.gmg137.netease-cloud-music-gtk|NetEase Cloud Music Gtk4|flathub|Linux music player for NetEase Cloud Music||2.5.2|0
@@ -423,7 +425,6 @@ A|com.github.scrivanolabs.scrivano|Scrivano for Handwritten Notes|flathub|A note
 A|com.github.sdv43.whaler|Whaler|flathub|Docker Container Management||1.2.5|0
 A|com.github.shonumi.gbe-plus|GB Enhanced+|flathub|Game Boy family emulator||1.9|0
 A|com.github.sixpounder.GameOfLife|Game of Life|flathub|Play Conway's Game of Life||0.6.1|0
-A|com.github.skullernet.q2pro|Q2PRO|flathub|Enhanced Quake 2 client||3510|0
 A|com.github.skylot.jadx|JADX|flathub|Dex to Java decompiler||1.5.3|0
 A|com.github.subhadeepjasu.pebbles|Pebbles|flathub|Perform advanced calculations with ease||2.0.5|0
 A|com.github.taiko2k.avvie|Avvie|flathub|Recortar imágenes para avatares o fondos de pantalla||2.4|0
@@ -501,6 +502,7 @@ A|com.itextpdf.RUPS|iText RUPS|flathub|iText RUPS is a tool to view PDF structur
 A|com.jagex.RuneScape|RuneScape|flathub|A free-to-play fantasy MMORPG||2.2.11|0
 A|com.jaquadro.NBTExplorer|NBTExplorer|flathub|A graphical NBT editor for all Minecraft NBT data sources||2.8.0|0
 A|com.jeffser.Alpaca|Alpaca|flathub|Chatea con modelos de IA||8.5.0|0
+A|com.jeffser.Nocturne|Nocturne|flathub|stable|||0
 A|com.jeffser.Pigment|Pigment|flathub|Obtén paletas de colores de imágenes||0.5.1|0
 A|com.jetbrains.CLion|CLion|flathub|A cross-platform IDE for C and C++||2025.3.1|0
 A|com.jetbrains.DataGrip|DataGrip|flathub|The Cross-Platform IDE for Databases and SQL||2025.3.2|0
@@ -531,17 +533,18 @@ A|com.krioltech.fnmap|Flutter nmap GUI|flathub|Fnmap is a GUI front end for the 
 A|com.kristianduske.TrenchBroom|TrenchBroom|flathub|Level editor for Quake-engine based games||2025.3|0
 A|com.ktechpit.colorsmith|colorsmith|flathub|stable|||0
 A|com.ktechpit.colorwall|ColorWall|flathub|The Ultimate Desktop Wallpaper Application||2.5|0
+A|com.ktechpit.glate|glate|flathub|stable|||0
 A|com.ktechpit.orion|Orion Torrent Client|flathub|Complete torrent client and streamer for Linux Desktop||3.0.0|0
 A|com.ktechpit.pixelbatch|pixelbatch|flathub|stable|||0
 A|com.ktechpit.torrhunt|Torrhunt|flathub|Torrent Search Engine||1.6|0
 A|com.ktechpit.ultimate-media-downloader|Ultimate Media Downloader|flathub|Online video & audio downloader for Linux, 1400+ websites support||5.6|0
 A|com.ktechpit.whatsie|Whatsie|flathub|Qt Whatsapp Web Client for Linux Desktop||4.16.3|0
 A|com.ktechpit.wonderwall|Wonderwall|flathub|Wallpaper manager||7.0|0
+A|com.kymorphia.Daphne|Daphne|flathub|stable|||0
 A|com.lablicate.OpenChrom|OpenChrom|flathub|Chromatography Data System||1.5.38|0
 A|com.leinardi.gst|GtkStressTesting|flathub|System utility designed to stress and monitor various hardware components||0.7.7|0
 A|com.leinardi.gx52|GX52|flathub|Provides control of LEDs and MFD for Logitech X52 and X52 Pro H.O.T.A.S.||0.7.6|0
 A|com.leohanney.Volaris|Volaris|flathub|Sleek file encryption/decryption||0.6.0|0
-A|com.librumreader.librum|Librum|flathub|A modern e-book reader and library manager||0.12.2|0
 A|com.lixgame.Lix|Lix|flathub|Lemmings-like game with puzzles, editor, multiplayer||v0.10.30|0
 A|com.locomalito.abbayedesmorts|L'Abbaye des morts|flathub|An obsolete video game for a dark passage of history||2.0.4|0
 A|com.logseq.Logseq|Logseq|flathub|Connect your notes and knowledge||0.10.14|0
@@ -565,8 +568,6 @@ A|com.meetfranz.Franz|Franz|flathub|Messenger for the desktop||5.11.0|0
 A|com.microsoft.AzureStorageExplorer|Azure Storage Explorer|flathub|Graphical tool to manage Azure cloud storage resources||v1.40.2|0
 A|com.microsoft.Edge|Microsoft Edge|flathub|Introducing the new Microsoft Edge web browser. It’s time to expect more. More privacy. More control. More productivity. More value.||143.0.3650.96-1|0
 A|com.mikrotik.WinBox|WinBox|flathub|RouterOS administration tool||4.0beta44|0
-A|com.milesalan.mepo|Mepo|flathub|Fast, simple, and hackable OSM map viewer for Linux||1.2.0|0
-A|com.ml4w.dotfilesinstaller|Dotfiles Installer|flathub|Manage dotfiles fast and secure||0.11.0|0
 A|com.moddb.TotalChaos|Total Chaos|flathub|Survival horror set on a remote island known as Fort Oasis||1.40|0
 A|com.moddb.TotalChaosRetro|Total Chaos Retro Edition|flathub|Survival horror set on a remote island known as Fort Oasis||1.40|0
 A|com.modrinth.ModrinthApp|Modrinth App|flathub|Modrinth's game launcher||0.10.15|0
@@ -596,6 +597,7 @@ A|com.nonpolynomial.intiface_central|Intiface Central|flathub|Buttplug Frontend 
 A|com.notepadqq.Notepadqq|Notepadqq|flathub|An advanced text editor||1.4.8|0
 A|com.notesnook.Notesnook|Notesnook|flathub|A fully open source & end-to-end encrypted note taking alternative to Evernote||v3.3.7|0
 A|com.ntrack.n-track|n-Track Studio|flathub|Producción Musical Creativa (DAW)||10.2.3-10380|0
+A|com.nuclearplayer.Nuclear|Nuclear|flathub|stable|||0
 A|com.obsproject.Studio|OBS Studio|flathub|Live stream and record videos||32.0.4|0
 A|com.odnoyko.valot|Valot|flathub|Time tracking without the hassle||0.9.1|0
 A|com.okta.developer.CLI|Okta CLI|flathub|The Okta CLI is the easiest way to get started with Okta!||0.10.0|0
@@ -604,8 +606,10 @@ A|com.onepassword.OnePassword|OnePassword|flathub|stable|||0
 A|com.openterface.openterfaceQT|openterfaceQT|flathub|App control openterface-Mini-KVM||0.3.12|0
 A|com.openwall.John|John the Ripper CE|flathub|Security auditing and recovery tool||1.9.1-ce|0
 A|com.opera.Opera|Opera|flathub|Your personal browser||125.0.5729.15|0
+A|com.opera.opera-gx|opera-gx|flathub|stable|||0
 A|com.oppzippy.OpenSCQ30|OpenSCQ30|flathub|Control Soundcore headphones||2.0.1|0
 A|com.orama_interactive.Pixelorama|Pixelorama|flathub|2D sprite editor with animation support||1.1.7|0
+A|com.orcaslicer.OrcaSlicer|OrcaSlicer|flathub|stable|||0
 A|com.outerwildsmods.owmods_gui|Outer Wilds Mod Manager|flathub|Install and run Outer Wilds mods||0.15.3|0
 A|com.ownrwallet.wallet|OWNR Crypto wallet & Visa Card|flathub|Send, receive, withdraw, exchange & buy virtual currencies. Only you control access and assets||2.5.0|0
 A|com.oyajun.ColorCode|Código de colores|flathub|Código de colores para el valor de resistencia||0.2.1|0
@@ -661,7 +665,6 @@ A|com.riverbankcomputing.PyQt.BaseApp|PyQt BaseApp|flathub|Shared platform for a
 A|com.riverbankcomputing.PyQt.BaseApp|PyQt BaseApp|flathub|Shared platform for applications that use PyQt||5.15.7|0
 A|com.riverbankcomputing.PyQt.BaseApp|PyQt BaseApp|flathub|Shared platform for applications that use PyQt||6.10.1|0
 A|com.riverbankcomputing.PyQt.BaseApp|PyQt BaseApp|flathub|Shared platform for applications that use PyQt||6.3.1|0
-A|com.riverbankcomputing.PyQt.BaseApp|PyQt BaseApp|flathub|Shared platform for applications that use PyQt||6.9.1|0
 A|com.rocksandpaper.syndic|Syndic|flathub|Feed reader for casual browsing||2.1|0
 A|com.rosegardenmusic.rosegarden|Rosegarden|flathub|Secuenciador de MIDI y editor de partitura con soporte de audio||25.12|0
 A|com.rq3.Reaction|Reaction|flathub|Movie realism first-person-shooter||1.0|0
@@ -918,6 +921,7 @@ A|dev.hdos.HDOS|HDOS|flathub|High Detail Old School Runescape Client||1.0.8|0
 A|dev.heppen.webapps|Quick Web Apps|flathub|Web applications at your fingertips||2.0.1|0
 A|dev.ibrahimcetin.reins|Reins: Chat for Ollama|flathub|Private AI Chat||1.3.3|0
 A|dev.invrs.oxide|Oxide|flathub|Blazing fast Modding tool for Linux built with Rust||0.5.0|0
+A|dev.j7126.combat_tracker|combat_tracker|flathub|stable|||0
 A|dev.jamiethalacker.window_painter|Window Painter|flathub|Fill the board with the same colour of paint||1.3.0|0
 A|dev.khcrysalis.PlumeImpactor|PlumeImpactor|flathub|stable|||0
 A|dev.krtirtho.Flemozi|Flemozi|flathub|Advanced⚡ Emoji Picker😀 for Linux🐧, Windows🪟 and macOS🍎||0.2.0|0
@@ -927,13 +931,14 @@ A|dev.levz.TinyImageFinder|Tiny Image Finder|flathub|Image Finder with Preview||
 A|dev.linwood.butterfly|Linwood Butterfly|flathub|Draw and organize ideas||v2.4.2|0
 A|dev.lizardbyte.app.Sunshine|Sunshine|flathub|GameStream host for Moonlight||2025.924.154138|0
 A|dev.lunarsrl.NovaMusic|Nova Music|flathub|A music player written in the libcosmic toolkit||1.0|0
+A|dev.mariinkys.Cedilla|Cedilla|flathub|stable|||0
 A|dev.mariinkys.Clockode|Clockode|flathub|TOTP Client||0.2.2|0
 A|dev.mariinkys.Oboete|Oboete|flathub|Flashcards application||0.2.1|0
 A|dev.mariinkys.StarryDex|StarryDex|flathub|A Pokédex Application||0.3.2|0
+A|dev.mooday.GstPipelineStudio|GstPipelineStudio|flathub|stable|||0
 A|dev.mrquantumoff.mcmodpackmanager|Quadrant for Minecraft|flathub|Manage your mods and modpacks with ease.||25.12.0|0
 A|dev.mufeed.Wordbook|Wordbook|flathub|Look up definitions for words||0.6.0|0
 A|dev.neovide.neovide|neovide|flathub|Advanced graphical interface for Neovim||0.15.1|0
-A|dev.opengoal.OpenGOAL|OpenGOAL|flathub|Launcher for the OpenGOAL Project||2.8.6|0
 A|dev.oswald.vkCommander|vkCommander|flathub|Fast and open source GUI for Valkey||0.0.9|0
 A|dev.overlayed.Overlayed|Overlayed|flathub|A Discord overlay||0.6.2|0
 A|dev.pantheum.janus|Janus|flathub|Simple text editor||0.9.7|0
@@ -972,12 +977,14 @@ A|ee.ria.qdigidoc4|DigiDoc4 Client|flathub|Estonian ID-card desktop application|
 A|engineer.atlas.Nyxt|Nyxt|flathub|The hacker's browser||3.12.0|0
 A|es.danirod.Cartero|Cartero|flathub|Haz peticiones HTTP y prueba APIs||25.0|0
 A|es.estoes.wallpaperDownloader|Wallpaper Downloader|flathub|Gestiona y descarga automáticamente fondos de pantalla desde Internet||4.5.0|0
+A|es.gob.afirma|afirma|flathub|stable|||0
 A|eu.ad5001.LogarithmPlotter|LogarithmPlotter|flathub|Create and edit Bode plots||0.5.0|0
 A|eu.betterbird.Betterbird|Betterbird|flathub|A better version of Thunderbird||140.6.0esr-bb15|0
 A|eu.binjr.binjr|binjr|flathub|stable|||0
 A|eu.cichy1173.tabela|tabela|flathub|Simple app that shows CSV content in table||1.0.9.3|0
 A|eu.codepoems.xl-converter|XL Converter|flathub|Convert images||1.2.3|0
 A|eu.fortysixandtwo.chessclock|Reloj de ajedrez|flathub|Tiempo de partidas de ajedrez sobre tablero||0.6.2|0
+A|eu.grimripper.grimripper|grimripper|flathub|stable|||0
 A|eu.ithz.umftpd|Usermode FTP Server|flathub|Access your files from another device||0.3.9|0
 A|eu.jumplink.Learn6502|Aprende 6502 Assembly|flathub|Programa consolas de videojuegos clásicas||0.6.3|0
 A|eu.ngdevelopment.tsukitag|Tsuki-tag|flathub|Anime imageboard browser, aggregator, downloader, tagger, converter, collection manager. Browse and create your own collections, configure workspaces for image downloads with templating support.||0.9.5|0
@@ -1006,18 +1013,19 @@ A|fr.handbrake.ghb|HandBrake|flathub|Video Transcoder||1.10.2|0
 A|fr.inria.corese.CoreseCommand|Corese Command|flathub|Handling the semantic web||4.6.2|0
 A|fr.inria.corese.CoreseGui|Corese Gui|flathub|Handling the semantic web||4.6.1|0
 A|fr.masson_informatique.WhosWho|WhosWho|flathub|Crear documentos PDF con fotos de personas y su nombre correspondiente, también llamado "quién es quién", "anuario"||2.2|0
+A|fr.nationsglory.launcher|launcher|flathub|stable|||0
 A|fr.natron.Natron|Natron|flathub|Compose industry-grade VFX and Motion Graphics.||2.5.0|0
 A|fr.nytuo.cosmiccomics|Cosmic Comics|flathub|Comics and manga reader and collectionner||v2.1.0|0
 A|fr.quentium.acters|acters|flathub|stable|||0
 A|fr.rubet.rpn|rpn|flathub|Reverse Polish Notation CLI calculator||2.5|0
 A|fr.sgued.bodev|Bodev|flathub|Low level dev tools||25.11|0
 A|fr.sgued.ten_forward|Ten Forward|flathub|Control a NAT-PMP gateway||25.11|0
+A|fun.dragonfly.switchfin|switchfin|flathub|stable|||0
 A|fun.vnote.app.VNote|VNote|flathub|A pleasant note-taking platform||3.20.0|0
 A|fyi.zoey.TeX-Match|TeX Match|flathub|Find LaTeX symbols by sketching||1.2.0|0
 A|games.zetsubou.AnAdventurersGallantry|An Adventurer's Gallantry|flathub|Disgraced knight-in-training Oren gets a second chance at life as an adventurer in this fantasy visual novel||1.0.0|0
 A|games.zetsubou.HumanityMustPerish|Humanity Must Perish|flathub|A comedic visual novel about an android dressed as a high school girl as she prepares to destroy humanity||1.2.2|0
 A|games.zetsubou.MaxMassacre|Max Massacre|flathub|A visual novel set in a monster-filled fantasy world||2.0.0|0
-A|games.zetsubou.SablesGrimoireDemo|Sable's Grimoire (Demo)|flathub|Monster girl visual novel which takes place in a magic academy||1.2.0|0
 A|games.zetsubou.WanderNoMore|Wander No More|flathub|A visual novel telling the story of a rogue samurai||1.2|0
 A|garden.jamie.Morphosis|Morphosis|flathub|Convertir sus documentos||49.0|0
 A|garden.turtle.Jellybean|Stockpile|flathub|Contabilice los artículos reponibles||0.5.0|0
@@ -1029,6 +1037,7 @@ A|hu.irl.sysex-controls|SysEx Controls|flathub|SysEx Controls for Linux||0.2.26|
 A|im.bernard.Funkcio|Funkcio|flathub|Draw functions from points||0.3|0
 A|im.bernard.Memorado|Memorado|flathub|Memorize anything||0.6|0
 A|im.bernard.Nostalgia|Nostalgia|flathub|Set historic GNOME wallpapers||0.11|0
+A|im.bernard.Parolu|Parolu|flathub|stable|||0
 A|im.dino.Dino|Dino|flathub|Un cliente de XMPP moderno||0.5|0
 A|im.fluffychat.Fluffychat|FluffyChat|flathub|Chat with your friends||2.3.1|0
 A|im.kaidan.kaidan|Kaidan|flathub|Aplicación de chat moderna para todos los dispositivos||0.13.0|0
@@ -1099,7 +1108,10 @@ A|io.github.AllanChain.sane-break|Sane Break|flathub|Break reminder, no mindless
 A|io.github.Andrettin.Wyrmsun|Wyrmsun|flathub|Strategy game based on history, mythology and fiction||5.3.5|0
 A|io.github.Archeb.opentrace|OpenTrace|flathub|A cross-platform GUI wrapper for NextTrace||1.4.4.0|0
 A|io.github.Arisotura.CoinKiller|CoinKiller|flathub|A level editor for NSMB2||2024-06-03|0
+A|io.github.AronCalvert.Workouts|Workouts|flathub|stable|||0
+A|io.github.AshBuk.FingerGo|FingerGo|flathub|stable|||0
 A|io.github.Bavarder.Bavarder|Bavarder|flathub|Chit-chat with an AI||1.0.0|0
+A|io.github.BlazingHotCode.CircuitSim|CircuitSim|flathub|stable|||0
 A|io.github.Bollos00.LibreMines|LibreMines|flathub|A Free/Libre and Open Source Software Qt based Minesweeper game||2.2.0|0
 A|io.github.BrisklyDev.Brisk|Brisk|flathub|Ultra-fast, modern download manager||2.3.8|0
 A|io.github.BuddySirJava.SSH-Studio|SSH Studio|flathub|Edit SSH configuration files||1.3.1|0
@@ -1115,6 +1127,7 @@ A|io.github.FailurePoint.RandomNumberFive|Random Number Five|flathub|Random numb
 A|io.github.Faugus.faugus-launcher|Faugus Launcher|flathub|A simple and lightweight app for running games using UMU-Launcher||1.11.7-1|0
 A|io.github.FedericoCalzoni.EventRecorder|EventRecorder|flathub|Record Timed Events||1.0.6|0
 A|io.github.Foldex.AdwSteamGtk|AdwSteamGtk|flathub|Give Steam the Adwaita treatment||0.8.0|0
+A|io.github.Geocld.PeaSyo4Desk|PeaSyo4Desk|flathub|stable|||0
 A|io.github.Geocld.XStreamingDesktop|XStreamingDesktop|flathub|XStreaming: Lets you stream Xbox games to your device, supporting Xbox streaming and Xbox Cloud Gaming (XCloud).||1.9.3|0
 A|io.github.GoldenGnu.jEveAssets|jEveAssets|flathub|An out-of-game asset manager for Eve-Online||8.0.3|0
 A|io.github.Icalingua.Icalingua|Icalingua++|flathub|A Linux client for QQ and more||2.12.28|0
@@ -1155,6 +1168,7 @@ A|io.github.TheThirdOne.rars|RARS|flathub|RISC-V Assembler and Runtime Simulator
 A|io.github.TheWisker.Cavasik|Cavasik|flathub|Audio visualizer based on CAVA||v3.2.0|0
 A|io.github.TransmissionRemoteGtk|Transmission Remoto|flathub|Remotely manage the Transmission BitTorrent client||1.6.0|0
 A|io.github.Youda008.DoomRunner|Doom Runner|flathub|Preset-oriented graphical launcher of various ported Doom engines (an alternative to ZDL)||1.9.1|0
+A|io.github._0_don.clippy|clippy|flathub|stable|||0
 A|io.github._0xzer0x.qurancompanion|Quran Companion|flathub|Read and listen to the Quran||1.3.3|0
 A|io.github.aandrew_me.ytdn|ytDownloader|flathub|Download videos and audios from hundreds of sites||3.20.2|0
 A|io.github.accessory.minus_games_gui|Minus Games|flathub|Download, sync and run games||0.9.13|0
@@ -1168,6 +1182,8 @@ A|io.github.aginies.watermark|Watermark|flathub|Custom watermark on images||4.8|
 A|io.github.alainm23.planify|Planify|flathub|Forget about forgetting things||4.16.1|0
 A|io.github.alamahant.Asteria|Asteria|flathub|AI Reads your Birthchart||2.1.2|0
 A|io.github.alamahant.BinauralPlayer|BinauralPlayer|flathub|Full-featured media player with brainwave audio generation||1.3.0|0
+A|io.github.alamahant.Ermis|Ermis|flathub|stable|||0
+A|io.github.alamahant.IChingDiviner|IChingDiviner|flathub|stable|||0
 A|io.github.alamahant.Jasmine|Jasmine|flathub|Launch websites and sessions||1.2.4|0
 A|io.github.alamahant.Kerveros|Kerveros|flathub|2FA Code Generator||1.0.0|0
 A|io.github.alamahant.Selene|Selene|flathub|Tor-based p2p chat and file sharing manager||1.0.3|0
@@ -1189,6 +1205,8 @@ A|io.github.archisman_panigrahi.QuickBib|QuickBib|flathub|Quickly get BibTeX fro
 A|io.github.archisman_panigrahi.typhoon|Typhoon|flathub|Check the weather with style||1.3.1|0
 A|io.github.arunsivaramanneo.GPUViewer|GPU-Viewer|flathub|A front-end to glxinfo, vulkaninfo, clinfo and es2_info||3.23|0
 A|io.github.astralvixen.geforce-infinity|GeForce Infinity|flathub|Next-gen GeForce NOW application||v1.2.0|0
+A|io.github.athanor_dev.athanor-launcher|athanor-launcher|flathub|stable|||0
+A|io.github.avomar.dev-toolbox|dev-toolbox|flathub|stable|||0
 A|io.github.b43NnUNF4vidFYFhpqaLWy2ANawtRbMtUXZY9Pf.jumpdf|jumpdf|flathub|PDF viewer||1.1.0|0
 A|io.github.babaissarkar.ssplot|SSPlot|flathub|Simple plotting utility and numerical simulator||2.3.1|0
 A|io.github.basshift.Recall|Recall|flathub|stable|||0
@@ -1234,6 +1252,7 @@ A|io.github.cudatext.CudaText-Qt|CudaText|flathub|Open source and cross-platform
 A|io.github.cxong.cdogs-sdl|C-Dogs SDL|flathub|Classic overhead run-and-gun game||2.3.2|0
 A|io.github.dagargo.Elektroid|Elektroid|flathub|Sample and MIDI device manager||3.2.3|0
 A|io.github.daid.EmptyEpsilon|EmptyEpsilon|flathub|Spaceship bridge simulator game||2024.12.08|0
+A|io.github.daniacosta_dev.AuroraMediaPlayer|AuroraMediaPlayer|flathub|stable|||0
 A|io.github.danst0.passwordgenerator|Generador de contraseñas|flathub|Crea contraseñas seguras en segundos||0.4.0|0
 A|io.github.david_swift.Flashcards|Memorize|flathub|Study flashcards||0.2.5|0
 A|io.github.davidoc26.wallpaper_selector|Wallpaper Selector|flathub|Downloads and applies wallpapers||0.3.5|0
@@ -1247,6 +1266,7 @@ A|io.github.denzilferreira.asteroid_shooter|Asteroid Shooter|flathub|Co-op space
 A|io.github.dfandrich.gpscorrelate|GPS Correlate|flathub|Attaches GPS location to images||2.3|0
 A|io.github.dgsasha.Remembrance|Reminders|flathub|Set reminders for yourself||4.0|0
 A|io.github.dida_code.OpstaKultura|Opsta Kultura|flathub|Game, knowledge quiz||1.1.3|0
+A|io.github.didley.CamOverlay|CamOverlay|flathub|stable|||0
 A|io.github.diegoivan.GaticTacToe|GaticTacToe|flathub|Play Tic-tac-toe with your friends||0.5.1|0
 A|io.github.diegoivan.pdf_metadata_editor|Paper Clip|flathub|Edite metadatos de documentos PDF||5.0|0
 A|io.github.diegoivanme.flowtime|Flowtime|flathub|Use su tiempo sabiamente||6.1|0
@@ -1269,11 +1289,11 @@ A|io.github.dweymouth.supersonic|Supersonic|flathub|A lightweight cross-platform
 A|io.github.dxx_rebirth.dxx-rebirth|DXX-Rebirth|flathub|Modern cross-platform port of the Descent engine||0.60.0-beta2|0
 A|io.github.dyegoaurelio.simple-wireplumber-gui|Simple Wireplumber GUI|flathub|A simple GTK4 GUI for PipeWire||0.2.2|0
 A|io.github.dynobo.sphereview|SphereView|flathub|Explore photospheres and panoramas||0.1.4|0
-A|io.github.dzheremi2.lexi|Lexi|flathub|Construye tu propio diccionario||1.4|0
 A|io.github.dzheremi2.lrcmake-gtk|Cronógrafo|flathub|Sincronice las letras de sus canciones favoritas||5.3.1|0
 A|io.github.ebonjaeger.bluejay|Bluejay|flathub|Bluetooth device manager||1.0.3|0
 A|io.github.ec_.Quake3e.OpenArena|OpenArena|flathub|Free and open source first-person shooter||0.8.8|0
 A|io.github.ecotubehq.player|EcoTubeHQ|flathub|Minimal Resource HQ Video Player||25.12.02|0
+A|io.github.edewin.corex|corex|flathub|stable|||0
 A|io.github.efogdev.mpris-timer|Play Timer|flathub|Native-feeling timers||v2.2.2|0
 A|io.github.elahpeca.Eigen|Eigen|flathub|stable|||0
 A|io.github.electronstudio.WeylusCommunityEdition|Weylus Community Edition|flathub|Use your tablet as graphic tablet/touch screen on your computer||2024.8.1|0
@@ -1355,6 +1375,7 @@ A|io.github.hoisasa.SharksEmpire-English|Sharks Empire: English|flathub|Learn vo
 A|io.github.hrkfdn.ncspot|ncspot|flathub|Cross-platform ncurses Spotify client||1.3.2|0
 A|io.github.htkhiem.Euphonica|Euphonica|flathub|MPD client with delusions of grandeur||0.98.0-beta|0
 A|io.github.huderlem.porymap|Porymap|flathub|A map editor for the Pokémon generation 3 decompilation projects||6.2.0|0
+A|io.github.hugomg.xjump-sdl|xjump-sdl|flathub|stable|||0
 A|io.github.hurricangame.hurrican|Hurrican|flathub|Freeware jump and shoot game created by Poke53280||1.0.1|0
 A|io.github.hvdwofl.jExifToolGUI|jExifToolGUI|flathub|Simple frontend for the ExifTool||2.0.2|0
 A|io.github.hydrusnetwork.hydrus|Hydrus|flathub|Organize media on the desktop||650|0
@@ -1444,12 +1465,12 @@ A|io.github.lxndr.gswatcher|Game Server Watcher|flathub|Monitor and admin game s
 A|io.github.maddecoder.Classic-RBDOOM-3-BFG|Doom BFA|flathub|Doom BFA is a Doom 3 BFG GPL source port||1.4.1|0
 A|io.github.magnush.mhWaveEdit|mhWaveEdit|flathub|mhWaveEdit is a graphical program for editing sound files||1.4.24|0
 A|io.github.mak448a.QTCord|Qtcord|flathub|Lightweight Discord client||v0.0.22|0
-A|io.github.mandruis7.xbox-cloud-gaming-electron|xbox-cloud-gaming-electron|flathub|Open-source Xbox Cloud Electron client||1.0.1|0
 A|io.github.manisandro.gImageReader|gImageReader|flathub|A graphical (gtk) frontend to tesseract-ocr||3.4.3|0
 A|io.github.marco_calautti.DeltaPatcher|Delta Patcher|flathub|Applies and creates patches in xdelta format||3.1.6|0
 A|io.github.martchus.syncthingtray|Syncthing Tray|flathub|Tray application for Syncthing v1 and v2||2.0.5-1.b4c7e16|0
 A|io.github.martinrotter.rssguard|RSS Guard|flathub|Simple, yet powerful news feed reader||4.8.6|0
 A|io.github.martinrotter.textosaurus|Textosaurus|flathub|Simple cross-platform text editor based on Qt and QScintilla||0.9.12|0
+A|io.github.masakk1.press|press|flathub|stable|||0
 A|io.github.masterbillwoo.RiseOfThePenguinsGB|Rise of the Penguins GB|flathub|Retro penguin platformer for Gameboy||1.0.0|0
 A|io.github.meehow.Receiver|Receiver|flathub|stable|||0
 A|io.github.megakode.Wallrus|Wallrus|flathub|stable|||0
@@ -1482,7 +1503,6 @@ A|io.github.mlm_games.pomodorot|Pomodorot|flathub|A pomodoro timer which can blo
 A|io.github.mlm_games.yadaw|yadaw|flathub|stable|||0
 A|io.github.mmarco94.tambourine|Tambourine|flathub|Your music, minus the clutter||1.1.2|0
 A|io.github.mmp.Vice|Vice|flathub|stable|||0
-A|io.github.mohfy.word2ipa|Word2IPA|flathub|Turn words into their true sounds||1.2.5|0
 A|io.github.monsler.Kalorite|Kalorite|flathub|Lightweight audio player||2.0.1|0
 A|io.github.moonlight_mod.moonlight-installer|moonlight installer|flathub|Installer for moonlight, yet another Discord client mod||0.2.5|0
 A|io.github.mpc_qt.mpc-qt|MPC-QT|flathub|Media Player Classic reimplemented with Qt and libmpv||25.07|0
@@ -1495,6 +1515,7 @@ A|io.github.mukonqi.nottodbox|Nottodbox|flathub|Organize notes, to-dos and diari
 A|io.github.muse_sequencer.Muse|MusE|flathub|Digital Audio Workstation||4.2.1|0
 A|io.github.myst6re.makoureactor|Makou Reactor|flathub|A Field Editor for Final Fantasy VII||2.1.0|0
 A|io.github.nacho.mecalin|mecalin|flathub|stable|||0
+A|io.github.nacho.mundi|mundi|flathub|stable|||0
 A|io.github.naikari.Naikari|Naikari: Eye of Chaos|flathub|2-D freeform space mystery game||0.12.0|0
 A|io.github.najepaliya.kleaner|Kleaner|flathub|An Image Metadata Cleaner||1.0|0
 A|io.github.narunlifescience.AlphaPlot|AlphaPlot|flathub|AlphaPlot is a free application for Scientific Data Analysis and Visualization||1.02|0
@@ -1542,6 +1563,7 @@ A|io.github.phastmike.tags|Tags|flathub|Color logs based on tags||1.8|0
 A|io.github.philipk.boilr|BoilR|flathub|Add non-steam games to your steam library||1.9.6|0
 A|io.github.philippkosarev.bmi|BMI|flathub|Calculadora del índice de masa corporal||v4.1|0
 A|io.github.picocrypt.Picocrypt|Picocrypt|flathub|A very small, very simple, yet very secure encryption tool.||1.49|0
+A|io.github.picocrypt_ng.Picocrypt-NG|Picocrypt-NG|flathub|stable|||0
 A|io.github.pieterdd.RcloneShuttle|Rclone Shuttle|flathub|Upload your files to anywhere||0.1.7|0
 A|io.github.pieterdd.StretchBreak|Stretch Break|flathub|Reminds you to take regular breaks||0.1.8|0
 A|io.github.piotrek_k._2dTaskBoard|2dTaskBoard|flathub|Task management productivity app with markdown support||0.4.4|0
@@ -1633,14 +1655,18 @@ A|io.github.smallbasic.SmallBASIC|SmallBASIC|flathub|stable|||0
 A|io.github.smcameron.space-nerds-in-space|Space Nerds in Space|flathub|Spaceship bridge simulator||1.0.9|0
 A|io.github.smolblackcat.Progress|Progress|flathub|Kanban board application||1.7.3|0
 A|io.github.snesrev.Zelda3|zelda3|flathub|Zelda3 is a reverse engineered clone of Zelda - A Link to the Past||v0.3|0
+A|io.github.sniper1720.khushu|khushu|flathub|stable|||0
 A|io.github.sockeye_d.godl|godl|flathub|Godot version manager||1.3|0
 A|io.github.spacingbat3.webcord|WebCord|flathub|Web-based Discord client||4.12.1|0
 A|io.github.srb2.rphys|SRB2 Reveries|flathub|Gameplay overhaul mod for Sonic Robo Blast 2||f5a|0
+A|io.github.srpvpn.pulse|pulse|flathub|stable|||0
 A|io.github.sss_says_snek.diurnals|Diurnals|flathub|Get daily Todoist notifications||1.0.1|0
 A|io.github.stella_emu.Stella|Stella|flathub|Multi-platform Atari 2600 VCS emulator||6.7.1|0
+A|io.github.stephanecouturier.Katalog|Katalog|flathub|stable|||0
 A|io.github.streetpea.Chiaki4deck|chiaki-ng|flathub|Free and Open Source Client for PlayStation Remote Play||1.9.9|0
 A|io.github.strikerx3.ymir|Ymir|flathub|Sega Saturn Emulator||0.2.0|0
 A|io.github.subhra74.Muon|Muon|flathub|Graphical SFTP client and terminal emulator with helpful utilities||1.0.4|0
+A|io.github.subsoundorg.Subsound|Subsound|flathub|stable|||0
 A|io.github.suchnsuch.Tangent|Tangent|flathub|Record and connect your thoughts||0.10.3|0
 A|io.github.swordpuffin.hunt|Hunt|flathub|Find every word||1.1.5|0
 A|io.github.swordpuffin.rewaita|Rewaita|flathub|Bring color to Adwaita||1.1.0|0
@@ -1648,6 +1674,7 @@ A|io.github.swordpuffin.splices|Splices|flathub|A word making game||1.1.3|0
 A|io.github.swordpuffin.wardrobe|Wardrobe|flathub|Prettify your desktop effortlessly||1.1.3|0
 A|io.github.sxyazi.yazi|Yazi|flathub|Terminal file manager||25.4.8|0
 A|io.github.taboulet.BiggerTask|BiggerTask|flathub|A TinyTask clone for Linux||1.2|0
+A|io.github.tangsangsimida.easykiconverter|easykiconverter|flathub|stable|||0
 A|io.github.tapscodes.MuseAmp|MuseAmp|flathub|Normalize the volume in audio files||1.3.0|0
 A|io.github.tareksander.StoryReader|StoryReader|flathub|An offline library and reader for stories on ScribbleHub and RoyalRoad||0.9.1|0
 A|io.github.tcobbs.LDView|LDView|flathub|LDraw model viewer||4.6|0
@@ -1755,6 +1782,8 @@ A|io.gitlab.elescoute.spacelaunch|Space Launch|flathub|Rocket launches tracker||
 A|io.gitlab.floodlight.Presenter|Floodlight Presenter|flathub|Free, libre, open source presentation and lyrics program||0.10.2|0
 A|io.gitlab.gjwu.pdf-tinkerer|PDF Tinkerer|flathub|Compose and manipulate PDF files||11.4|0
 A|io.gitlab.guillermop.Counters|Counters|flathub|De seguimiento a cualquier cosa||1.3.2|0
+A|io.gitlab.ilshat_apps.gitpulsar|gitpulsar|flathub|stable|||0
+A|io.gitlab.ilshat_apps.manuscript|manuscript|flathub|stable|||0
 A|io.gitlab.jazztickets.choria|choria|flathub|Old school multiplayer RPG||1.1.1|0
 A|io.gitlab.jazztickets.emptyclip|Empty Clip|flathub|Empty Clip is a top-down shooter action RPG||2.0.3|0
 A|io.gitlab.jazztickets.irrlamb|irrlamb|flathub|3D physics platformer||1.0.7|0
@@ -1763,6 +1792,7 @@ A|io.gitlab.leesonwai.Sums|Sums|flathub|Calculate with postfix notation||0.16|0
 A|io.gitlab.leesonwai.Tactics|Tactics|flathub|Build your soccer lineup||0.13|0
 A|io.gitlab.librewolf-community|LibreWolf|flathub|LibreWolf Web Browser||146.0.1-1|0
 A|io.gitlab.liferooter.TextPieces|Text Pieces|flathub|Developer's scratchpad||4.3.1|0
+A|io.gitlab.metadatacleaner.metadatacleaner|metadatacleaner|flathub|stable|||0
 A|io.gitlab.news_flash.NewsFlash|Newsflash|flathub|Manténgase al día con sus canales||4.2.1|0
 A|io.gitlab.osslugaru.Lugaru|Lugaru HD|flathub|Third person ninja rabbit fighting game||1.2|0
 A|io.gitlab.persiangolf.voicegen|VoiceGen|flathub|Easily convert text to speech||3.0.0|0
@@ -1869,6 +1899,7 @@ A|io.sourceforge.trigger_rally.TriggerRally|Trigger Rally|flathub|Fast-paced sin
 A|io.sourceforge.wsjt.wsjtx|wsjtx|flathub|stable|||0
 A|io.sourceforge.xtrkcad_fork.xtrkcad|XTrackCAD|flathub|Design model railroad layouts||5.3.1GA|0
 A|io.sourceforge.zaz|Zaz|flathub|Puzzle game where the player has to arrange balls in triplets.||1.0.1|0
+A|io.speedofsound.SpeedOfSound|SpeedOfSound|flathub|stable|||0
 A|io.stoplight.studio|Stoplight Studio|flathub|Stoplight Studio. Effortless API Design.||2.10.0 Update 5|0
 A|io.tether.QVAC.Workbench|Workbench|flathub|stable|||0
 A|io.thenexusavenger.Nexus-LU-Launcher|Nexus LU Launcher|flathub|Launcher for LEGO Universe||V.2.3.0|0
@@ -1882,6 +1913,7 @@ A|io.wavebox.Wavebox|Wavebox|flathub|The next generation of web-desktop communic
 A|io.webtorrent.WebTorrent|WebTorrent|flathub|Streaming torrent app||0.24|0
 A|io.welle.welle-gui|welle.io|flathub|A DAB/DAB+ Software Radio||2.7-flathub-512558d|0
 A|ir.imansalmani.IPlan|IPlan|flathub|Your plan for improving personal life and workflow||1.9.1|0
+A|it.andreafontana.hideout|hideout|flathub|stable|||0
 A|it.astrogods.AstroGods|AstroGods|flathub|stable|||0
 A|it.cuteworks.pacmanlogviewer|Pacman Log Viewer|flathub|Inspect pacman log||1.5.1|0
 A|it.dottorblaster.cauldron|Cauldron|flathub|Collect content from the web||0.5.0|0
@@ -1910,7 +1942,6 @@ A|me.drewol.Unnamed-SDVX-Clone|Unnamed SDVX Clone|flathub|A game based on KShoot
 A|me.dumke.Reinschrift|Reinschrift|flathub|stable|||0
 A|me.dumke.deliveries|deliveries|flathub|stable|||0
 A|me.dusansimic.DynamicWallpaper|Fondos de Pantalla Dinámicos|flathub|Create light/dark wallpapers for GNOME 42 and beyond||0.1.0|0
-A|me.hyliu.fluentreader|Fluent Reader|flathub|Modern desktop RSS reader||1.1.4|0
 A|me.iepure.Ticketbooth|Ticket Booth|flathub|No pierda de vista sus programas favoritos||1.2.0|0
 A|me.iepure.devtoolbox|Dev Toolbox|flathub|Herramientas de desarrollo a tu alcance||1.3.0|0
 A|me.kozec.syncthingtk|Syncthing GTK|flathub|GUI and notification area icon for Syncthing||v0.9.4.5|0
@@ -1924,6 +1955,7 @@ A|me.sergiotarxz.Exd|Hiperthermia|flathub|Program your thermal printer||v1.0.15|
 A|me.sergiotarxz.JapaChar|Japachar|flathub|Learn Japanese characters||v2.00-rc2|0
 A|me.simakis.dropboxignore|dropboxignore|flathub|It's all about the missing .dropboxignore file.||1.1.0|0
 A|me.spaceinbox.actioneer|Actioneer|flathub|Native GTK4/libadwaita desktop client for GitHub Actions (Rust)||1.0.0|0
+A|me.spaceinbox.swiftynotes|swiftynotes|flathub|stable|||0
 A|me.timschneeberger.GalaxyBudsClient|Earbud manager for Galaxy Buds|flathub|An unofficial app to manage any Galaxy Buds device manufactured by Samsung||5.1.0.2|0
 A|me.timschneeberger.jdsp4linux|JamesDSP|flathub|Open-source audio effect processor for Pipewire||2.7.0|0
 A|media.emby.EmbyServer|Emby Server|flathub|The open media solution||4.9.1.90|0
@@ -1946,6 +1978,7 @@ A|net._86box._86Box|86Box|flathub|An emulator for classic IBM PC clones||5.3|0
 A|net.agalwood.Motrix|Motrix|flathub|A full-featured download manager||1.37.0|0
 A|net.andyofniall.missingno|missingno|flathub|stable|||0
 A|net.ankiweb.Anki|Anki|flathub|Powerful, intelligent flash cards||25.09.02|0
+A|net.armatik.Kitsune|Kitsune|flathub|stable|||0
 A|net.audiorelay.AudioRelay|AudioRelay|flathub|Stream audio between your devices||0.27.5|0
 A|net.bartkessels.getit|GetIt|flathub|Send HTTP requests to API endpoints||4.0.10|0
 A|net.base_art.Glide|Glide|flathub|Play movies and audio files||0.6.6|0
@@ -1968,6 +2001,7 @@ A|net.code_industry.MasterPDFEditor|Master PDF Editor|flathub|Master PDF Editor 
 A|net.codelogistics.clicker|Clicker|flathub|Simulate user input repeatedly||0.1.8|0
 A|net.codelogistics.letters|Letters|flathub|Word processor for GNOME||0.2.0|0
 A|net.codelogistics.webapps|Aplicaciones web|flathub|Instalar sitios web como aplicaciones||0.5.12|0
+A|net.conceptualspace.prunr|prunr|flathub|stable|||0
 A|net.corluma.Corluma|Corluma|flathub|For Hues, LIFX, Nanoleafs, and Arduinos.||1.04.01|0
 A|net.cozic.joplin_desktop|Joplin|flathub|open source note taking and to-do application||3.4.12|0
 A|net.crossfireatlas.crossfire|Crossfire RPG|flathub|Roguelike multi-user RPG||1.1|0
@@ -1984,6 +2018,7 @@ A|net.emulicious.Emulicious|Emulicious|flathub|stable|||0
 A|net.epson.epsonscan2|Epson Scan 2|flathub|Software for Epson scanners & multifunction printer||6.7.82.0|0
 A|net.eudic.dict|Eudic|flathub|Authoritative English dictionary software||2025-05-15|0
 A|net.fasterland.converseen|Converseen|flathub|Convert and resize images in batch||0.15.1.3|0
+A|net.ffkkinos.Wildcard|Wildcard|flathub|stable|||0
 A|net.fhannenheim.musicfetch|musicfetch|flathub|stable|||0
 A|net.filebot.FileBot|FileBot|flathub|Rename media files perfectly||5.2.0|0
 A|net.freerct.FreeRCT|FreeRCT|flathub|Theme park strategy game||0.1|0
@@ -1999,6 +2034,7 @@ A|net.hhoney.rota|ROTA|flathub|Gravity bends beneath your feet||2025.08.18|0
 A|net.hhoney.tinycrate|Tiny Crate|flathub|Crate-chucking action puzzler||2025.04.29|0
 A|net.hovancik.Stretchly|Stretchly|flathub|The break time reminder app||1.19.0|0
 A|net.huitsi.ParallelOverhead|Parallel Overhead|flathub|Endless runner game||1.1.4|0
+A|net.huitsi.PhantomOverload|PhantomOverload|flathub|stable|||0
 A|net.imaginaryinfinity.Squiid|Squiid|flathub|Advanced algebraic & RPN calculator||1.3.0|0
 A|net.jami.Jami|Jami|flathub|Comparte, libre y privadamente||20251212.0|0
 A|net.jenyay.Outwiker|Outwiker|flathub|Personal wiki and outliner.||3.3.0.940|0
@@ -2154,6 +2190,7 @@ A|net.zdechov.app.xTactics|xTactics|flathub|Risk like turn-based strategy game||
 A|net.zgcoder.skycheckers|Sky Checkers|flathub|Blast enemies off a stage||1.3.1|0
 A|network.bisq.Bisq|Bisq|flathub|A decentralized bitcoin exchange network||1.9.22|0
 A|network.loki.Session|Session Desktop|flathub|Private messenger||1.17.5|0
+A|nl.andreasknoben.Laser|Laser|flathub|stable|||0
 A|nl.brixit.powersupply|Powersupply|flathub|Linux power subsystem debugger||0.9.0|0
 A|nl.brixit.wiremapper|Wiremapper|flathub|Linux client for Pockethernet network tester||0.9.1|0
 A|nl.emphisia.icon|Iconic|flathub|Add icons on top of folders||2025.9.1|0
@@ -2238,6 +2275,7 @@ A|org.cloudcompare.CloudCompare|CloudCompare|flathub|3D point cloud and mesh pro
 A|org.cockpit_project.CockpitClient|Cockpit Client|flathub|Web-based server interface via ssh||352|0
 A|org.codeblocks.codeblocks|Code::Blocks|flathub|IDE for C, C++ and Fortran||25.03|0
 A|org.contourterminal.Contour|Contour Terminal Emulator|flathub|Contour is a modern and actually fast, modal, virtual terminal emulator, for everyday use||0.4.3|0
+A|org.cosmic_utils.enroll|enroll|flathub|stable|||0
 A|org.cryptomator.Cryptomator|Cryptomator|flathub|Encryption for your cloud made easy||1.18.0|0
 A|org.cubocore.CoreAction|CoreAction|flathub|A side bar with some handy gadgets||4.5.0|0
 A|org.cubocore.CoreArchiver|CoreArchiver|flathub|A simple file compressing/extracting utility||4.5.0|0
@@ -2369,7 +2407,6 @@ A|org.freedesktop.adriconf|adriconf|flathub|Advanced DRI configurator||2.7.3|0
 A|org.freedesktop.appstream-glib|appstream-glib|flathub|AppStream files validation an tools||0.8.1|0
 A|org.freedesktop.appstream.cli|CLI de AppStream|flathub|Una utilidad para trabajar con los metadatos de AppStream||1.1.1|0
 A|org.freedesktop.appstream.generator|AppStream Generator|flathub|A fast AppStream metadata generator||0.10.1|0
-A|org.freedesktop.dabrain34.GstPipelineStudio|GstPipelineStudio|flathub|Draw your own GStreamer pipeline...||0.4.0|0
 A|org.freedesktop.dabrain34.squared|squared|flathub|Try to fill the square with numbers||0.1.1|0
 A|org.freedesktop.fwupd|fwupd|flathub|Update device firmware on Linux||2.0.19|0
 A|org.freedownloadmanager.Manager|Manager|flathub|stable|||0
@@ -2419,7 +2456,6 @@ A|org.gnome.Crosswords.Editor|Editor de Crucigramas|flathub|Crear crucigramas||0
 A|org.gnome.Crosswords|Crucigramas|flathub|Resolver crucigramas||0.3.16|0
 A|org.gnome.Decibels|Reproductor de sonido|flathub|Reproduzca archivos de sonido||49.0|0
 A|org.gnome.DejaDup|Copias de seguridad Déjà Dup|flathub|Protéjase frente a las pérdidas de datos||49.2|0
-A|org.gnome.Devhelp|Devhelp|flathub|Una herramienta para desarrolladores que sirve para explorar y buscar documentación de la API||43.0|0
 A|org.gnome.EasyTAG|EasyTAG|flathub|Editar los metadatos de archivos de sonido||2.4.3|0
 A|org.gnome.Epiphany|Web|flathub|Navegue por la web||49.2|0
 A|org.gnome.Evince|Visor de documentos|flathub|Visor de documentos para formatos de documentos populares||48.1|0
@@ -2445,6 +2481,7 @@ A|org.gnome.Logs|Registros|flathub|Ver registros detallados de eventos del siste
 A|org.gnome.Lollypop|Lollypop|flathub|Reproduzca y organice su colección de música||1.4.45|0
 A|org.gnome.Loupe|Visor de imágenes|flathub|Ver imágenes||49.1|0
 A|org.gnome.Mahjongg|Mahjongg|flathub|Emparejar fichas iguales y limpiar el tablero||49.0.1|0
+A|org.gnome.Manuals|Manuals|flathub|stable|||0
 A|org.gnome.Maps|Mapas|flathub|Encuentre lugares por todo el mundo||49.3|0
 A|org.gnome.Mines|Minas|flathub|Limpie de minas el campo minado||48.1|0
 A|org.gnome.Music|Música|flathub|Reproducir y organizar su colección de música||49.1|0
@@ -2514,6 +2551,7 @@ A|org.gnome.gitlab.ilhooq.Bookup|Bookup|flathub|Streamline notes with Markdown!|
 A|org.gnome.gitlab.johannesjh.favagtk|Fava|flathub|Do your finances using fava and beancount||2.0.1|0
 A|org.gnome.gitlab.powimod.aion-task|AionTask|flathub|Cyclic task manager||0.9.3|0
 A|org.gnome.gitlab.somas.Apostrophe|Apostrophe|flathub|Edita markdown con estilo||3.4|0
+A|org.gnome.gitlab.wwarner.Solitaire|Solitaire|flathub|stable|||0
 A|org.gnome.glabels-3|gLabels|flathub|Create labels and business cards||3.4.1|0
 A|org.gnome.meld|Meld|flathub|Compare y combine sus archivos||3.22.3|0
 A|org.gnome.moserial|moserial|flathub|Terminal serie||3.0.21|0
@@ -2552,7 +2590,6 @@ A|org.godotengine.godot.BaseApp|godot base de aplicación|flathub|4.4-25.08|||0
 A|org.godotengine.godot.BaseApp|godot base de aplicación|flathub|4.5|||0
 A|org.godotengine.godot.BaseApp|godot base de aplicación|flathub|4.6|||0
 A|org.goldcoinproject.goldcoin-qt|Goldcoin|flathub|Discover the Gold Standard of Digital Currency.||0.15.0|0
-A|org.goldendict.GoldenDict|GoldenDict|flathub|Dictionary lookup program||1.5.0RC2 (b4f3fcd)|0
 A|org.gottcode.Connectagram|Connectagram|flathub|Unscramble words placed in patterns||1.3.8|0
 A|org.gottcode.CuteMaze|CuteMaze|flathub|Find targets in a maze||1.3.5|0
 A|org.gottcode.FocusWriter|FocusWriter|flathub|Procesador de texto a pantalla completa||1.8.13|0
@@ -2596,6 +2633,7 @@ A|org.jacktrip.JackTrip|JackTrip|flathub|Connect and play with other musicians||
 A|org.jamovi.jamovi|jamovi|flathub|Real-time statistical spreadsheet||2.7.2|0
 A|org.jaspstats.JASP|JASP|flathub|Classical and Bayesian Statistics||0.95.4|0
 A|org.jdownloader.JDownloader|JDownloader|flathub|Descargar herramienta de gestión||2.0|0
+A|org.jeffvli.feishin|feishin|flathub|stable|||0
 A|org.jellyfin.JellyfinDesktop|JellyfinDesktop|flathub|stable|||0
 A|org.jellyfin.JellyfinServer|Jellyfin Server|flathub|Media Streaming System||10.11.5|0
 A|org.jflap.JFLAP|JFLAP|flathub|Formal languages testing||7.1|0
@@ -2603,7 +2641,6 @@ A|org.jitsi.jitsi-meet|Jitsi Meet|flathub|Jitsi Meet - Secure, Simple and Scalab
 A|org.jjazzlab.JJazzLab|JJazzLab|flathub|Generate backing tracks for any song||5.0.1|0
 A|org.jousse.vincent.Pomodorolm|pomodorolm|flathub|A simple, good looking and configurable pomodoro tracker with tray icon.||0.7.0|0
 A|org.jreleaser.cli|jreleaser|flathub|Release projects quickly and easily with JReleaser||1.21.0|0
-A|org.js.nuclear.Nuclear|Nuclear|flathub|Unlimited free music player||v0.6.48|0
 A|org.karapulse.Karapulse|Karapulse|flathub|Karaoke machine||0.6.5|0
 A|org.kartkrew.RingRacers|Dr. Robotnik's Ring Racers|flathub|Racing at the Next Level||2.4|0
 A|org.kde.CrowTranslate|Crow Translate|flathub|Aplicación que le permite traducir y leer textos usando Mozhi||3.1.0|0
@@ -2620,6 +2657,7 @@ A|org.kde.audiotube|AudioTube|flathub|Aplicación de música de YouTube||25.08.3
 A|org.kde.blinken|Blinken|flathub|Juego para la mejora de la memoria||25.12.0|0
 A|org.kde.bomber|Bomber|flathub|Juego recreativo de bombas||25.12.0|0
 A|org.kde.bovo|Bovo|flathub|Juego de mesa «Cinco en línea»||25.12.0|0
+A|org.kde.calindori|calindori|flathub|stable|||0
 A|org.kde.calligra|Calligra|flathub|Solución ofimática todo en uno||25.12.0|0
 A|org.kde.cantor|Cantor|flathub|Interfaz para software matemático||25.12.0|0
 A|org.kde.digikam|digiKam|flathub|Programa de gestión de fotos||8.8.0|0
@@ -2797,7 +2835,6 @@ A|org.libretro.RetroArch|RetroArch|flathub|Frontend for emulators, game engines 
 A|org.libsdl.Maelstrom|Maelstrom|flathub|High Quality Asteroids Clone||3.0.7|0
 A|org.libvips.nip4|nip4|flathub|Image processing spreadsheet||9.0.14|0
 A|org.libvips.vipsdisp|Vipsdisp|flathub|Image viewer||4.1.3|0
-A|org.linux_hardware.hw-probe|Hardware Probe|flathub|Check operability of computer hardware and find drivers||1.6.5|0
 A|org.linuxshowplayer.LinuxShowPlayer|Linux Show Player|flathub|Cue player designed for stage productions||0.6.5|0
 A|org.localsend.localsend_app|LocalSend|flathub|Share files to nearby devices||1.17.0|0
 A|org.love2d.love2d|LÖVE|flathub|LÖVE is an awesome 2D game framework for Lua.||11.5|0
@@ -2938,7 +2975,6 @@ A|org.shadered.SHADERed|SHADERed|flathub|Tool for creating and testing HLSL and 
 A|org.shotcut.Shotcut|Shotcut|flathub|Video editor||25.10.31|0
 A|org.signal.Signal|Signal Desktop|flathub|Private messenger||7.83.0|0
 A|org.sigxcpu.Livi|Light Video|flathub|A simple GTK4 based video player (not only) for mobile phones||0.3.2|0
-A|org.sil.Bloom|Bloom|flathub|Literacy materials development for language communities||5.4.1|0
 A|org.sil.dictionary-app-builder|Dictionary App Builder|flathub|Build dictionary apps: pics & audio||13.3|0
 A|org.sil.keyboard-app-builder|Keyboard App Builder|flathub|Build apps with Keyman keyboards||13.3|0
 A|org.sil.reading-app-builder|Reading App Builder|flathub|Build apps with synced text and audio||13.3.1|0
@@ -2946,6 +2982,7 @@ A|org.sil.scripture-app-builder|Scripture App Builder|flathub|Build apps with Sc
 A|org.simondalvai.ball2box|Ball2Box|flathub|Shoot the ball into the red box||4.1.9|0
 A|org.simondalvai.pocket-broomball|Pocket Broomball|flathub|World's first Broomball video game||6.1.3|0
 A|org.siril.Siril|Siril|flathub|Astronomical image processor||1.4.0|0
+A|org.skaven.ratic|ratic|flathub|stable|||0
 A|org.skytemple.Randomizer|SkyTemple Randomizer|flathub|Randomizer for Pokémon Mystery Dungeon Explorers of Sky||2.2.0|0
 A|org.skytemple.SkyTemple|SkyTemple|flathub|ROM Editor for Pokémon Mystery Dungeon Explorers of Sky||1.8.4|0
 A|org.soapui.SoapUI|SoapUI Open Source|flathub|Testing solution for APIs||5.9.1|0
@@ -2978,6 +3015,7 @@ A|org.sugarlabs.BaseApp|sugarlabs base de aplicación|flathub|21.04|||0
 A|org.sugarlabs.BaseApp|sugarlabs base de aplicación|flathub|22.06|||0
 A|org.sugarlabs.BaseApp|sugarlabs base de aplicación|flathub|23.06|||0
 A|org.sugarlabs.BaseApp|sugarlabs base de aplicación|flathub|24.04|||0
+A|org.sugarlabs.BaseApp|sugarlabs base de aplicación|flathub|26.04|||0
 A|org.sugarlabs.Calculate|Calculate|flathub|An infix-notation graphing calculator||47|0
 A|org.sugarlabs.CellGame|CellGame|flathub|Based on gene regulatory networks||5|0
 A|org.sugarlabs.Chart|Chart|flathub|Create your charts||13|0
@@ -3016,6 +3054,7 @@ A|org.svxlink.Qtel|Qtel|flathub|EchoLink Client||1.2.5|0
 A|org.swi_prolog.swipl|SWI-Prolog|flathub|ISO/Edinburgh-style Prolog interpreter||9.3.36|0
 A|org.synfig.SynfigStudio|Synfig Studio|flathub|Create and edit 2D animations and compositions||1.5.3|0
 A|org.syntalos.syntalos|Syntalos|flathub|Synchronized data acquisition from diverse sources and flexible experiment control||2.1.1|0
+A|org.tabos.bloodpressure|bloodpressure|flathub|stable|||0
 A|org.tabos.maxcontrol|Max Control|flathub|Control software for Max! devices||0.5.4|0
 A|org.tabos.roger|Roger Router|flathub|Journal, Fax-Software and Call-Monitor for AVM FRITZ!Box or compatible||2.4.2|0
 A|org.tabos.saldo|Saldo|flathub|Check your bank accounts||0.8.4|0
@@ -3092,6 +3131,7 @@ A|org.yacas.yacas-gui|Yancas|flathub|Yet Another Computer Algebra System||1.9.1|
 A|org.yamagi.YamagiQ2|Yamagi Quake II|flathub|Yamagi Quake II is an alternative client for id Software's Quake II||8.5.1|0
 A|org.zaproxy.ZAP|ZAP|flathub|A popular free security tool||2.17.0|0
 A|org.zdoom.Raze|Raze|flathub|Source port for Build engine games||1.11.0-1|0
+A|org.zdoom.UZDoom|UZDoom|flathub|stable|||0
 A|org.zealdocs.Zeal|Zeal|flathub|Documentation browser||0.7.2|0
 A|org.zim_wiki.Zim|Zim|flathub|Write notes in a desktop wiki||0.76.3|0
 A|org.zotero.Zotero|Zotero|flathub|Collect, organize, cite, and share research||7.0.30|0
@@ -3153,8 +3193,6 @@ A|party.supertux.supertuxparty|Super Tux Party|flathub|A party game starring FLO
 A|pl.ksefinvoice.KsefInvoice|KsefInvoice|flathub|stable|||0
 A|pl.nieto.fityk|Fityk|flathub|Curve fitting tool||v1.3.1|0
 A|pl.suve.colorful|Colorful|flathub|Side-view shooter game||2.2|0
-A|pl.youkai.lanchat|Lanchat|flathub|LAN chat and file transfer||2.10.1|0
-A|pl.youkai.nscan|nscan|flathub|Network scanner.||0.5.1|0
 A|pm.mirko.Atoms|Atoms|flathub|Manage Chroot and Containers.||1.1.2|0
 A|pro.saladin.Eeman|Eeman|flathub|Track Salah, Read the Quran||0.1.2|0
 A|pw.mmk.OpenFreebuds|OpenFreebuds|flathub|Companion app for HUAWEI earphones||0.17.1|0
@@ -3193,7 +3231,6 @@ A|sa.sy.bluerecorder|Blue Recorder|flathub|A simple screen recorder for Linux de
 A|se.cendio.tlclient|ThinLinc Client|flathub|The Linux remote desktop server built on open source technology||4.19.0-4005|0
 A|se.emijoh.mpw|MasterPasswordApp CLI|flathub|Calculate  a site's password, when you need it.||2024.1.15|0
 A|se.manyver.Manyverse|Manyverse Desktop|flathub|decentralized social network||0.2310.9-beta|0
-A|se.principia_web.principia|Principia|flathub|Physics-based sandbox building game||2025.04.05|0
 A|se.sjoerd.GIScan|GIScan|flathub|Read and analyze GISAXS data stored in cbf format||1.1.6|0
 A|se.sjoerd.Graphs|Gráficos|flathub|Trace y manipule datos||1.8.6|0
 A|se.trixon.Mapollage|Mapollage|flathub|Create KML files from geotagged photos||3.0.0|0
@@ -3221,6 +3258,7 @@ A|surf.deckr.deckr|Deckr|flathub|Deckr Desktop App||2.10.44|0
 A|systems.tranquil.Map|Map|flathub|stable|||0
 A|tech.digiroad.Convertidor|Convertidor|flathub|Converting units of measurement||1.2.2|0
 A|tech.digiroad.ImageFlow|ImageFlow|flathub|stable|||0
+A|tech.dongdongbh.mindwtr|mindwtr|flathub|stable|||0
 A|tech.emendir.QR-ScanGen|QR-ScanGen|flathub|A simple cross-platform QR code scanner and generator||1.4.1|0
 A|tech.feliciano.pocket-casts|Pocket Casts|flathub|Online podcast player||0.10.2|0
 A|tech.keyforge.keyforge_master|KeyForge Master|flathub|Configurator software for KeyForge devices||v1.1.2|0
@@ -3249,6 +3287,7 @@ A|uk.org.greenend.chiark.sgtatham.putty|PuTTY|flathub|SSH, Telnet and Rlogin cli
 A|uk.org.greenend.chiark.sgtatham.puzzles|Simon Tatham's Portable Puzzle Collection|flathub|Puzzle game collection||20241229|0
 A|uk.org.zint.zint-qt|Zint Barcode Studio|flathub|Barcode generator||2.13.0|0
 A|uno.platform.uno-calculator|Uno Calculator|flathub|Linux port of the Microsoft Windows calculator app||1.2.9|0
+A|us.acei.AbsoluteInfinity|AbsoluteInfinity|flathub|stable|||0
 A|us.ihmc.cmap.CmapTools|CmapTools|flathub|Create and share concept maps||6.04|0
 A|us.materialio.Materialious|Materialious|flathub|Materialious is a privacy respecting frontend for YouTube built ontop of Invidious.||1.12.8|0
 A|us.pixls.art.ART|ART|flathub|An advanced raw photo development program||1.25.12|0
@@ -3263,13 +3302,13 @@ A|xyz.aguno.CubeTimer|CubeTimer|flathub|Like a StackMat but for Linux||0.1.9|0
 A|xyz.audiostellar.AudioStellar|AudioStellar|flathub|AI powered experimental sampler||1.4|0
 A|xyz.hyperplay.HyperPlay|HyperPlay|flathub|Play Windows and Linux Games||v0.31.0|0
 A|xyz.ketok.Speedtest|Speedtest|flathub|Mida la velocidad de su conexión a Internet||1.4.0|0
-A|xyz.kusma.aurora|Aurora|flathub|Aurora by Excess||0.1.0|0
 A|xyz.mx_moment.moment|Moment|flathub|Customizable and keyboard-operable Matrix client||0.7.5|0
 A|xyz.parlatype.Parlatype|Parlatype|flathub|Reproductor multimedia para transcripciones||4.3|0
 A|xyz.rescribe.rescribe|Rescribe|flathub|OCR images, PDFs and Google Books||1.4.0|0
 A|xyz.rust4diva.Rust4Diva|Rust4Diva|flathub|Cross platform mod manager for Project Diva Mega Mix+||0.4.4|0
 A|xyz.safeworlds.hiit|Temporizador de ejercicio|flathub|Entrenar y descansar con alta intensidad||1.9.1|0
 A|xyz.safeworlds.midiconn|midiconn|flathub|Virtual MIDI hub||0.3.3|0
+A|xyz.slothlife.Diveboard|Diveboard|flathub|stable|||0
 A|xyz.slothlife.Jogger|Jogger|flathub|Monitor de la actividad física||1.3.2|0
 A|xyz.splashmapper.Splash|Splash|flathub|Immersive video mapping engine||0.11.14|0
 A|xyz.stuerz.BilligSweeper|BilligSweeper|flathub|A cheap clone of Minesweeper||1.3|0
