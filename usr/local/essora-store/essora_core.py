@@ -17,7 +17,9 @@
 #
 import json
 import os
+import pty
 import re
+import select
 import shutil
 import subprocess
 import threading
@@ -492,6 +494,87 @@ class ActivityManager:
         except Exception as e:
             GLib.idle_add(self.gui.update_progress_text, f"[dpkg --configure -a] {e}")
 
+    def _run_deb_pty(self, cmd, env, progress_start=0.0, progress_end=1.0):
+        """Ejecuta un comando DEB via PTY para soportar debconf interactivo.
+        #agregado por josejp2424
+        - Conecta el PTY master al diálogo de progreso para que el usuario
+          pueda responder preguntas de debconf (grub, etc.) directamente.
+        - Devuelve el exit code del proceso.
+        """
+        from gi.repository import GLib
+
+        master_fd, slave_fd = pty.openpty()
+
+        proc = subprocess.Popen(
+            cmd,
+            stdin=slave_fd,
+            stdout=slave_fd,
+            stderr=slave_fd,
+            close_fds=True,
+            env=env,
+            start_new_session=True
+        )
+        os.close(slave_fd)
+
+        # Conectar PTY master al diálogo para input interactivo
+        GLib.idle_add(self.gui.enable_pty_input, master_fd)
+
+        current_progress = progress_start
+
+        try:
+            while True:
+                try:
+                    r, _, _ = select.select([master_fd], [], [], 0.1)
+                except (ValueError, OSError):
+                    break
+
+                if r:
+                    try:
+                        data = os.read(master_fd, 4096)
+                        if not data:
+                            break
+                        text = data.decode("utf-8", errors="replace")
+                        for line in text.splitlines():
+                            line = line.strip()
+                            if line and not line.startswith("pmstatus:"):
+                                GLib.idle_add(self.gui.update_progress_text, line)
+                            # parse progress
+                            prog = parse_apt_progress(line)
+                            if prog is not None:
+                                scaled = progress_start + prog * (progress_end - progress_start)
+                                current_progress = min(scaled, progress_end - 0.01)
+                                GLib.idle_add(self.gui.update_progress_bar, current_progress)
+                    except OSError:
+                        break
+
+                if proc.poll() is not None:
+                    # drain remaining output
+                    try:
+                        while True:
+                            r2, _, _ = select.select([master_fd], [], [], 0.05)
+                            if not r2:
+                                break
+                            data = os.read(master_fd, 4096)
+                            if not data:
+                                break
+                            text = data.decode("utf-8", errors="replace")
+                            for line in text.splitlines():
+                                line = line.strip()
+                                if line and not line.startswith("pmstatus:"):
+                                    GLib.idle_add(self.gui.update_progress_text, line)
+                    except OSError:
+                        pass
+                    break
+        finally:
+            try:
+                os.close(master_fd)
+            except OSError:
+                pass
+            GLib.idle_add(self.gui.disable_pty_input)
+
+        proc.wait()
+        return proc.returncode
+
     def _bg(self, fn, app: Optional[Application] = None):
         def worker():
             ok = True
@@ -650,114 +733,45 @@ class ActivityManager:
     def _update_all_deb(self):
         from gi.repository import GLib
 
-        # #agregado por josejp2424 — env noninteractive para todo el proceso
+        # #editado por josejp2424 — usa PTY para soportar debconf interactivo
         env = os.environ.copy()
         env["DEBIAN_FRONTEND"] = "noninteractive"
 
         GLib.idle_add(self.gui.show_progress_dialog, tr("Updating all DEB packages"), "deb")
-
-        # #agregado por josejp2424 — pre-responder preguntas de grub-pc y grub-efi
-        # para que no queden esperando input aunque DEBIAN_FRONTEND=noninteractive
-        try:
-            grub_disk = ""
-            try:
-                import subprocess as _sp
-                result = _sp.run(
-                    ["grub-probe", "--target=disk", "/boot"],
-                    stdout=_sp.PIPE, stderr=_sp.DEVNULL, text=True, timeout=5
-                )
-                grub_disk = result.stdout.strip()
-            except Exception:
-                pass
-
-            if grub_disk:
-                selections = (
-                    f"grub-pc grub-pc/install_devices multiselect {grub_disk}\n"
-                    f"grub-pc grub-pc/install_devices_disks_changed multiselect {grub_disk}\n"
-                    f"grub-efi-amd64 grub2/update_nvram boolean true\n"
-                )
-                _sp.run(
-                    ["debconf-set-selections"],
-                    input=selections, text=True,
-                    stdout=_sp.DEVNULL, stderr=_sp.DEVNULL,
-                    env=env, timeout=10
-                )
-        except Exception:
-            pass
-
         GLib.idle_add(self.gui.update_progress_text, tr("Updating package lists..."))
 
+        # Step 1: apt-get update (sin PTY, no tiene interacción)
         p1 = subprocess.Popen(
             ["apt-get", "update"],
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
-            text=True,
-            bufsize=1,
-            env=env
+            text=True, bufsize=1, env=env
         )
-        
         for line in iter(p1.stdout.readline, ''):
-            if line:
+            if line.strip():
                 GLib.idle_add(self.gui.update_progress_text, line.strip())
-        
         p1.wait()
-        
+
         if p1.returncode != 0:
             GLib.idle_add(self.gui.hide_progress_dialog)
             GLib.idle_add(self.gui.on_activity_done, tr("Error updating package lists"))
             return
-        
 
         GLib.idle_add(self.gui.update_progress_text, tr("Upgrading packages..."))
-        GLib.idle_add(self.gui.update_progress_bar, 0.5)
-        
-        fd_r, fd_w = os.pipe()
-        p2 = subprocess.Popen(
-            [
-                "apt-get", "upgrade", "-y",
-                f"-o=APT::Status-Fd={fd_w}",
-                "-o", "Dpkg::Options::=--force-confold",  # conservar config ISO
-                "-o", "Dpkg::Options::=--force-confdef",
-            ],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            text=True,
-            bufsize=1,
-            pass_fds=(fd_w,),
-            env=env
-        )
-        os.close(fd_w)
-        
- 
-        import select
-        
-        status_file = os.fdopen(fd_r, 'r')
-        while True:
-            readable, _, _ = select.select([p2.stdout, status_file], [], [], 0.1)
-            
-            if p2.stdout in readable:
-                line = p2.stdout.readline()
-                if line:
-                    GLib.idle_add(self.gui.update_progress_text, line.strip())
-            
-            if status_file in readable:
-                line = status_file.readline()
-                if line:
-                    prog = parse_apt_progress(line)
-                    if prog is not None:
+        GLib.idle_add(self.gui.update_progress_bar, 0.1)
 
-                        scaled_prog = 0.5 + (prog * 0.5)
-                        GLib.idle_add(self.gui.update_progress_bar, scaled_prog)
-            
-            if p2.poll() is not None:
-                break
-        
-        status_file.close()
-        p2.wait()
-        
+        # Step 2: apt-get upgrade via PTY — debconf puede mostrar preguntas
+        # El usuario puede responder directamente en el diálogo de progreso
+        cmd = [
+            "apt-get", "upgrade", "-y",
+            "-o", "Dpkg::Options::=--force-confold",
+            "-o", "Dpkg::Options::=--force-confdef",
+        ]
+        rc = self._run_deb_pty(cmd, env, progress_start=0.1, progress_end=1.0)
+
         GLib.idle_add(self.gui.hide_progress_dialog)
-        
-        if p2.returncode == 0:
+
+        if rc == 0:
             self._reload_catalog("deb")
             GLib.idle_add(self.gui.on_activity_done, tr("All DEB packages updated"))
         else:
@@ -827,81 +841,34 @@ class ActivityManager:
     def _upgrade_deb_package(self, pkg_name: str):
         from gi.repository import GLib
 
+        # #editado por josejp2424 — usa PTY para debconf interactivo
+        env = os.environ.copy()
+        env["DEBIAN_FRONTEND"] = "noninteractive"
+
         self._run_dpkg_configure()
 
         cmd = [
             "apt-get", "install", "--only-upgrade", "-y",
-            "-o", "APT::Status-Fd=1", 
-            "-o", "Dpkg::Progress-Fancy=1",
-            "-o", "Dpkg::Options::=--force-confdef",  
-            "-o", "Dpkg::Options::=--force-confold",  
+            "-o", "Dpkg::Options::=--force-confold",
+            "-o", "Dpkg::Options::=--force-confdef",
             pkg_name
         ]
 
         GLib.idle_add(self.gui.show_progress_dialog, tr("Updating {pkg}", pkg=pkg_name), "deb")
 
-        process = subprocess.Popen(
-            cmd,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            text=True,
-            bufsize=1,
-            start_new_session=True
-        )
+        rc = self._run_deb_pty(cmd, env, progress_start=0.0, progress_end=0.99)
 
-        current_progress = 0.0
-        in_download_phase = True
-        download_progress = 0.0
-        install_progress = 0.0
-
-        for line in iter(process.stdout.readline, ''):
-            if not line:
-                continue
-            line_stripped = line.strip()
-
-            if not line_stripped.startswith("pmstatus:"):
-                GLib.idle_add(self.gui.update_progress_text, line_stripped)
-
-            if "update-initramfs" in line or "initramfs" in line.lower():
-                GLib.idle_add(self.gui.update_progress_text, 
-                    tr("Generating initramfs (this may take a while)..."))
-                current_progress = 0.95
-                GLib.idle_add(self.gui.update_progress_bar, current_progress)
-
-            if "Unpacking" in line or "Setting up" in line or "Processing triggers" in line:
-                in_download_phase = False
-
-            apt_progress = parse_apt_progress(line)
-            if apt_progress is not None:
-                if in_download_phase:
-                    download_progress = apt_progress
-                    current_progress = min(download_progress * 0.5, 0.49)
-                else:
-                    install_progress = apt_progress
-                    current_progress = min(0.5 + install_progress * 0.5, 0.99)
-                GLib.idle_add(self.gui.update_progress_bar, current_progress)
-            elif "Get:" in line or "Fetched" in line:
-                current_progress = min(current_progress + 0.01, 0.49)
-                GLib.idle_add(self.gui.update_progress_bar, current_progress)
-            elif "Unpacking" in line or "Setting up" in line:
-                current_progress = min(current_progress + 0.02, 0.99)
-                GLib.idle_add(self.gui.update_progress_bar, current_progress)
-
-        process.wait()
-        
         self._reload_catalog("deb")
-        
-        if process.returncode != 0:
+
+        if rc != 0:
             GLib.idle_add(self.gui.hide_progress_dialog)
-            raise Exception(tr("Error updating DEB '{pkg}' (code {code})", pkg=pkg_name, code=process.returncode))
+            raise Exception(tr("Error updating DEB '{pkg}' (code {code})", pkg=pkg_name, code=rc))
 
         GLib.idle_add(self.gui.update_progress_bar, 1.0)
-
         try:
             subprocess.run(["/usr/local/bin/fixmenu"], check=False, timeout=5)
         except Exception:
             pass
-
         GLib.idle_add(self.gui.hide_progress_dialog)
 
 
@@ -1008,132 +975,63 @@ class ActivityManager:
     def _install_deb(self, app: Application):
         from gi.repository import GLib
 
+        # #editado por josejp2424 — usa PTY para debconf interactivo
+        env = os.environ.copy()
+        env["DEBIAN_FRONTEND"] = "noninteractive"
+
         self._run_dpkg_configure()
 
         cmd = [
-            "apt-get", "install", "-y", 
-            "-o", "APT::Status-Fd=1", 
-            "-o", "Dpkg::Progress-Fancy=1",
-            "-o", "Dpkg::Options::=--force-confdef",  
-            "-o", "Dpkg::Options::=--force-confold",  
+            "apt-get", "install", "-y",
+            "-o", "Dpkg::Options::=--force-confold",
+            "-o", "Dpkg::Options::=--force-confdef",
             app.app_id
         ]
-        
+
         GLib.idle_add(self.gui.show_progress_dialog, tr("Installing {app}", app=app.name), "deb")
-        
-        process = subprocess.Popen(
-            cmd,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            text=True,
-            bufsize=1,
-            start_new_session=True
-        )
-        
-        current_progress = 0.0
-        in_download_phase = True
-        download_progress = 0.0
-        install_progress = 0.0
-        
-        for line in iter(process.stdout.readline, ''):
-            if line:
-                line_stripped = line.strip()
-                
 
-                if not line_stripped.startswith("pmstatus:"):
-                    GLib.idle_add(self.gui.update_progress_text, line_stripped)
-                
+        rc = self._run_deb_pty(cmd, env, progress_start=0.0, progress_end=0.99)
 
-                if "Unpacking" in line or "Setting up" in line or "Processing triggers" in line:
-                    in_download_phase = False
-                
-    
-                apt_progress = parse_apt_progress(line)
-                if apt_progress is not None:
-                    if in_download_phase:
-                        download_progress = apt_progress
+        if rc != 0:
+            raise Exception(tr("Error installing DEB (code {code})", code=rc))
 
-                        current_progress = min(download_progress * 0.5, 0.49)
-                    else:
-                        install_progress = apt_progress
-                        
-                        current_progress = min(0.5 + install_progress * 0.5, 0.99)
-                    GLib.idle_add(self.gui.update_progress_bar, current_progress)
-                elif "Get:" in line or "Fetched" in line:
-                    
-                    current_progress = min(current_progress + 0.01, 0.49)
-                    GLib.idle_add(self.gui.update_progress_bar, current_progress)
-                elif "Unpacking" in line or "Setting up" in line:
-                   
-                    current_progress = min(current_progress + 0.02, 0.99)
-                    GLib.idle_add(self.gui.update_progress_bar, current_progress)
-        
-        process.wait()
-        
-        if process.returncode != 0:
-            raise Exception(tr("Error installing DEB (code {code})", code=process.returncode))
-        
         GLib.idle_add(self.gui.update_progress_bar, 1.0)
-        
-      
         self._reload_catalog("deb")
         try:
             subprocess.run(["/usr/local/bin/fixmenu"], check=False, timeout=5)
         except Exception:
             pass
-        
         GLib.idle_add(self.gui.hide_progress_dialog)
 
     def _uninstall_deb(self, app: Application):
         from gi.repository import GLib
 
+        # #editado por josejp2424 — usa PTY para debconf interactivo
+        env = os.environ.copy()
+        env["DEBIAN_FRONTEND"] = "noninteractive"
+
         self._run_dpkg_configure()
 
-        cmd = ["apt-get", "remove", "-y", "-o", "APT::Status-Fd=1", app.app_id]
-        
-        GLib.idle_add(self.gui.show_progress_dialog, tr("Uninstalling {app}", app=app.name), "deb")
-        
-        process = subprocess.Popen(
-            cmd,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            text=True,
-            bufsize=1,
-            start_new_session=True
-        )
-        
-        current_progress = 0.0
-        
-        for line in iter(process.stdout.readline, ''):
-            if line:
-                line_stripped = line.strip()
-                if not line_stripped.startswith("pmstatus:"):
-                    GLib.idle_add(self.gui.update_progress_text, line_stripped)
-                
-                apt_progress = parse_apt_progress(line)
-                if apt_progress is not None:
-                    current_progress = min(apt_progress, 0.99)
-                    GLib.idle_add(self.gui.update_progress_bar, current_progress)
-                elif "Removing" in line:
-                    current_progress = min(current_progress + 0.1, 0.99)
-                    GLib.idle_add(self.gui.update_progress_bar, current_progress)
-        
-        process.wait()
-        
-        if process.returncode != 0:
-            raise Exception(tr("Error uninstalling DEB (code {code})", code=process.returncode))
-        
-        GLib.idle_add(self.gui.update_progress_bar, 1.0)
-        
-    
+        cmd = [
+            "apt-get", "remove", "-y",
+            "-o", "Dpkg::Options::=--force-confold",
+            "-o", "Dpkg::Options::=--force-confdef",
+            app.app_id
+        ]
 
- 
+        GLib.idle_add(self.gui.show_progress_dialog, tr("Uninstalling {app}", app=app.name), "deb")
+
+        rc = self._run_deb_pty(cmd, env, progress_start=0.0, progress_end=0.99)
+
+        if rc != 0:
+            raise Exception(tr("Error uninstalling DEB (code {code})", code=rc))
+
+        GLib.idle_add(self.gui.update_progress_bar, 1.0)
         self._reload_catalog("deb")
         try:
             subprocess.run(["/usr/local/bin/fixmenu"], check=False, timeout=5)
         except Exception:
             pass
-        
         GLib.idle_add(self.gui.hide_progress_dialog)
 
 
@@ -1320,73 +1218,32 @@ class ActivityManager:
     def _reinstall_deb(self, app: Application):
         from gi.repository import GLib
 
-        # #agregado por josejp2424 — resolver dpkg interrumpido antes de reinstalar
+        # #editado por josejp2424 — usa PTY para debconf interactivo
+        env = os.environ.copy()
+        env["DEBIAN_FRONTEND"] = "noninteractive"
+
         self._run_dpkg_configure()
 
         cmd = [
             "apt-get", "install", "--reinstall", "-y",
-            "-o", "APT::Status-Fd=1", 
-            "-o", "Dpkg::Progress-Fancy=1",
-            "-o", "Dpkg::Options::=--force-confdef",  
-            "-o", "Dpkg::Options::=--force-confold",  
+            "-o", "Dpkg::Options::=--force-confold",
+            "-o", "Dpkg::Options::=--force-confdef",
             app.app_id
         ]
 
         GLib.idle_add(self.gui.show_progress_dialog, tr("Reinstalling {app}", app=app.name), "deb")
 
-        process = subprocess.Popen(
-            cmd,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            text=True,
-            bufsize=1,
-            start_new_session=True
-        )
+        rc = self._run_deb_pty(cmd, env, progress_start=0.0, progress_end=0.99)
 
-        current_progress = 0.0
-        in_download_phase = True
-        download_progress = 0.0
-        install_progress = 0.0
-
-        for line in iter(process.stdout.readline, ''):
-            if not line:
-                continue
-            line_stripped = line.strip()
-
-            if not line_stripped.startswith("pmstatus:"):
-                GLib.idle_add(self.gui.update_progress_text, line_stripped)
-
-            if "Unpacking" in line or "Setting up" in line or "Processing triggers" in line:
-                in_download_phase = False
-
-            apt_progress = parse_apt_progress(line)
-            if apt_progress is not None:
-                if in_download_phase:
-                    download_progress = apt_progress
-                    current_progress = min(download_progress * 0.5, 0.49)
-                else:
-                    install_progress = apt_progress
-                    current_progress = min(0.5 + install_progress * 0.5, 0.99)
-                GLib.idle_add(self.gui.update_progress_bar, current_progress)
-            elif "Get:" in line or "Fetched" in line:
-                current_progress = min(current_progress + 0.01, 0.49)
-                GLib.idle_add(self.gui.update_progress_bar, current_progress)
-            elif "Unpacking" in line or "Setting up" in line:
-                current_progress = min(current_progress + 0.02, 0.99)
-                GLib.idle_add(self.gui.update_progress_bar, current_progress)
-
-        process.wait()
-        if process.returncode != 0:
-            raise Exception(tr("Error reinstalling DEB (code {code})", code=process.returncode))
+        if rc != 0:
+            raise Exception(tr("Error reinstalling DEB (code {code})", code=rc))
 
         GLib.idle_add(self.gui.update_progress_bar, 1.0)
-
         self._reload_catalog("deb")
         try:
             subprocess.run(["/usr/local/bin/fixmenu"], check=False, timeout=5)
         except Exception:
             pass
-
         GLib.idle_add(self.gui.hide_progress_dialog)
 
     def _reinstall_appimage(self, app: Application):

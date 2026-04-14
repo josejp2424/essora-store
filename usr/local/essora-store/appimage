@@ -1,150 +1,151 @@
 #!/bin/bash
-# Essora Store
+# Essora Store — AppImage list generator
+# Fuente: https://appimage.github.io/feed.json  (catálogo oficial AppImageHub)
 # Copyright (C) 2025 josejp2424
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-# See the GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 set -euo pipefail
 
+# ── Rutas ─────────────────────────────────────────────────────────────────────
 JSON_FILE="/usr/local/essora-store/appimage-store.json"
-ICON_PATH="/usr/local/essora-store/icons/app_appimage.png"
-ARCHIVE_URL="https://archive.org/download/appimage"
-TEMP_FILE="/tmp/archive_appimages.html"
+ICON_CACHE_DIR="/usr/local/essora-store/icons/appimage"
+FALLBACK_ICON="/usr/local/essora-store/icons/app_appimage.png"
+FEED_URL="https://appimage.github.io/feed.json"
+ICON_BASE_URL="https://appimage.github.io/database"
+GITHUB_API="https://api.github.com/repos"
 
-# Where AppImages are considered installed
 APPIMAGE_DIR_USER="${HOME}/Applications"
 APPIMAGE_ROOT_SYSTEM="/opt/appimage"
 
-mkdir -p "$(dirname "$JSON_FILE")" "$APPIMAGE_DIR_USER" 2>/dev/null || true
+FEED_CACHE="/tmp/appimage_feed_$$.json"
+trap 'rm -f "$FEED_CACHE"' EXIT
 
-echo "== Essora Store: generating appimage-store.json =="
+mkdir -p "$(dirname "$JSON_FILE")" "$APPIMAGE_DIR_USER" "$ICON_CACHE_DIR" 2>/dev/null || true
 
-download_list() {
-  echo "Downloading AppImage list from archive.org…"
+echo "== Essora Store: generando appimage-store.json =="
+
+# ── Descarga ──────────────────────────────────────────────────────────────────
+download_feed() {
+  echo "Descargando catálogo desde appimage.github.io…"
   if command -v curl >/dev/null 2>&1; then
-    curl -fsSL "$ARCHIVE_URL" -o "$TEMP_FILE"
+    curl -fsSL "$FEED_URL" -o "$FEED_CACHE"
   elif command -v wget >/dev/null 2>&1; then
-    wget -q "$ARCHIVE_URL" -O "$TEMP_FILE"
+    wget -q "$FEED_URL" -O "$FEED_CACHE"
   else
-    echo "ERROR: curl or wget is required" >&2
+    echo "ERROR: se requiere curl o wget" >&2
     exit 1
   fi
 }
 
+# ── Ícono por app ─────────────────────────────────────────────────────────────
+# El feed.json tiene "icons": ["NombreApp/icons/512x512/app.png"]
+# URL completa: https://appimage.github.io/database/NombreApp/icons/...
+get_icon() {
+  local icon_rel="$1"   # ej: "86Box/icons/512x512/86box.png"
+  local app_id="$2"
+
+  [[ -z "$icon_rel" ]] && echo "$FALLBACK_ICON" && return
+
+  local ext="${icon_rel##*.}"
+  local cache_file="$ICON_CACHE_DIR/${app_id}.${ext}"
+
+  # Si ya está cacheado, devolver ruta
+  if [[ -f "$cache_file" ]]; then
+    echo "$cache_file"
+    return
+  fi
+
+  local icon_url="${ICON_BASE_URL}/${icon_rel}"
+
+  # Descargar silenciosamente; si falla usar fallback
+  if command -v curl >/dev/null 2>&1; then
+    curl -fsSL --max-time 10 "$icon_url" -o "$cache_file" 2>/dev/null || { rm -f "$cache_file"; echo "$FALLBACK_ICON"; return; }
+  else
+    wget -q --timeout=10 "$icon_url" -O "$cache_file" 2>/dev/null || { rm -f "$cache_file"; echo "$FALLBACK_ICON"; return; }
+  fi
+
+  echo "$cache_file"
+}
+
+# ── Obtener URL de descarga del último release en GitHub ──────────────────────
+# El feed tiene "links": [{"type":"GitHub","url":"owner/repo"}, {"type":"Download","url":"..."}]
+# Usamos "Download" directo si existe; si no, GitHub API para el último .AppImage
+get_download_url() {
+  local github_path="$1"   # ej: "86Box/86Box"
+  local direct_url="$2"    # URL de Download del feed (puede ser "")
+
+  # Si el feed ya da URL directa de releases, usarla
+  if [[ -n "$direct_url" ]]; then
+    echo "$direct_url"
+    return
+  fi
+
+  [[ -z "$github_path" ]] && echo "" && return
+
+  # Intentar GitHub API (sin auth, rate-limited a 60 req/h)
+  local api_url="${GITHUB_API}/${github_path}/releases/latest"
+  local rel_json
+  if command -v curl >/dev/null 2>&1; then
+    rel_json=$(curl -fsSL --max-time 10 "$api_url" 2>/dev/null || echo "")
+  else
+    rel_json=$(wget -q --timeout=10 -O- "$api_url" 2>/dev/null || echo "")
+  fi
+
+  # Buscar primer .AppImage en assets
+  local dl_url
+  dl_url=$(echo "$rel_json" | grep -o '"browser_download_url":"[^"]*\.AppImage"' | head -n1 | cut -d'"' -f4 || true)
+
+  echo "$dl_url"
+}
+
+# ── Versión instalada ─────────────────────────────────────────────────────────
+find_installed_path() {
+  local app_id="$1"
+  local p1="$APPIMAGE_ROOT_SYSTEM/$app_id/$app_id.AppImage"
+  [[ -f "$p1" ]] && echo "$p1" && return
+  find "$APPIMAGE_DIR_USER" -maxdepth 1 -type f -iname "*${app_id}*.AppImage" 2>/dev/null | head -n1 || true
+}
+
 extract_version() {
-  # 1) semver-ish (1.2.3)
   local s="$1"
   local v
   v=$(echo "$s" | grep -oE '([0-9]+\.)+[0-9]+' | head -n1 || true)
-  if [[ -n "$v" ]]; then
-    echo "$v"
-    return
-  fi
-  # 2) dates like 20240101
-  v=$(echo "$s" | grep -oE '20[0-9]{2}[0-9]{2}([0-9]{2})?' | head -n1 || true)
-  echo "$v"
-}
-
-normalize_id() {
-  # convert to stable id
-  echo "$1" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g; s/--*/-/g; s/^-//; s/-$//'
-}
-
-clean_name_from_filename() {
-  # similar to previous script
-  local base="$1"
-  base=${base%.AppImage}
-  base=$(echo "$base" | \
-    sed -E 's/[-_](x86_64|i386|i686|amd64|linux|Linux|X64|x64|X86|windows|Windows)//g' | \
-    sed -E 's/[-_]([0-9]+\.[0-9]+(\.[0-9]+)*)//g' | \
-    sed -E 's/[-_]20[0-9]{2}([0-9]{2})*//g' | \
-    sed 's/[-_]$//' | sed 's/^[-_]//')
-  [[ -z "$base" || "$base" == "." ]] && base="${1%.AppImage}"
-  echo "$base"
-}
-
-display_name() {
-  echo "$1" | sed 's/_/ /g; s/-/ /g; s/\./ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) tolower(substr($i,2))}1'
+  [[ -n "$v" ]] && echo "$v" && return
+  echo ""
 }
 
 ver_newer() {
-  # returns 0 if v2 > v1
-  local v1="$1"
-  local v2="$2"
+  local v1="$1" v2="$2"
   [[ -z "$v1" || -z "$v2" ]] && return 1
   local top
   top=$(printf '%s\n%s\n' "$v1" "$v2" | sort -V | tail -n1)
   [[ "$top" == "$v2" && "$v2" != "$v1" ]]
 }
 
-find_installed_path() {
-  local app_id="$1"
-  local p1="$APPIMAGE_ROOT_SYSTEM/$app_id/$app_id.AppImage"
-  if [[ -f "$p1" ]]; then
-    echo "$p1"
-    return
-  fi
-  # fallback: search in ~/Applications for something containing the id
-  local found
-  found=$(find "$APPIMAGE_DIR_USER" -maxdepth 1 -type f -iname "*${app_id}*.AppImage" 2>/dev/null | head -n1 || true)
-  echo "$found"
+normalize_id() {
+  echo "$1" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g; s/--*/-/g; s/^-//; s/-$//'
 }
 
-download_list
+# ── Main ──────────────────────────────────────────────────────────────────────
+download_feed
 
-if [[ ! -s "$TEMP_FILE" ]]; then
-  echo "ERROR: Could not download AppImage list" >&2
+if [[ ! -s "$FEED_CACHE" ]]; then
+  echo "ERROR: No se pudo descargar el catálogo" >&2
   exit 1
 fi
 
-# Extract .AppImage names from HTML
-TMP_ENTRIES="/tmp/appimage_entries.$$"
-TMP_PICKED="/tmp/appimage_picked.$$"
-trap 'rm -f "$TEMP_FILE" "$TMP_ENTRIES" "$TMP_PICKED"' EXIT
-
-echo "Processing list…"
-
-while IFS= read -r filename; do
-  # clean '>'
-  filename=${filename#>}
-  [[ -z "$filename" ]] && continue
-
-  # filter junk
-  if [[ "$filename" == *"__ia_thumb"* || "$filename" == *".torrent"* || "$filename" == *".xml"* || "$filename" == *".sqlite"* ]]; then
-    continue
-  fi
-
-  clean=$(clean_name_from_filename "$filename")
-  id=$(normalize_id "$clean")
-  [[ -z "$id" ]] && continue
-
-  ver=$(extract_version "$filename")
-  disp=$(display_name "$clean")
-  printf '%s|%s|%s|%s\n' "$id" "$disp" "$ver" "$filename" >> "$TMP_ENTRIES"
-done < <(grep -o '>[^<]*\.AppImage' "$TEMP_FILE" | sed 's/^>//')
-
-if [[ ! -s "$TMP_ENTRIES" ]]; then
-  echo "ERROR: No valid AppImages found in the list." >&2
-  echo "[]" > "$JSON_FILE"
-  exit 0
+# Verificar que jq esté disponible (necesario para parsear el feed JSON)
+if ! command -v jq >/dev/null 2>&1; then
+  echo "ERROR: 'jq' es requerido para parsear el feed. Instalar con: apt-get install jq" >&2
+  exit 1
 fi
 
-# Choose 1 file per app_id (the "highest" version with sort -V).
-# If an app has no detectable version, it will have an empty ver; we still pick one.
-sort -t'|' -k1,1 -k3,3V "$TMP_ENTRIES" | awk -F'|' '{pick[$1]=$0} END{for(k in pick) print pick[k]}' > "$TMP_PICKED"
+echo "Procesando catálogo…"
 
-# Generate JSON
 echo "[" > "$JSON_FILE"
 
 first=1
@@ -152,58 +153,90 @@ total=0
 installed_count=0
 upd_count=0
 
-while IFS='|' read -r app_id disp ver filename; do
+# Iterar cada item del feed
+while IFS= read -r item; do
+  name=$(echo "$item" | jq -r '.name // ""')
+  [[ -z "$name" ]] && continue
+
+  # Descripción (puede ser null)
+  desc=$(echo "$item" | jq -r '.description // ""' | sed 's/<[^>]*>//g' | tr -d '\n' | sed 's/"/\\"/g')
+  [[ -z "$desc" ]] && desc="AppImage: $name"
+
+  # Categoría
+  category=$(echo "$item" | jq -r '.categories[0] // "Utility"')
+
+  # Ícono (primer elemento del array)
+  icon_rel=$(echo "$item" | jq -r '.icons[0] // ""')
+
+  # Links
+  github_path=$(echo "$item" | jq -r '.links[] | select(.type=="GitHub") | .url' 2>/dev/null | head -n1 || echo "")
+  direct_dl=$(echo "$item" | jq -r '.links[] | select(.type=="Download") | .url' 2>/dev/null | head -n1 || echo "")
+
+  app_id=$(normalize_id "$name")
   [[ -z "$app_id" ]] && continue
-  total=$((total+1))
 
-  url="$ARCHIVE_URL/$filename"
+  # Ícono: descargar si no está cacheado
+  icon_path=$(get_icon "$icon_rel" "$app_id")
 
+  # URL de descarga
+  download_url=$(get_download_url "$github_path" "$direct_dl")
+  # Si no hay URL de descarga directa, usar la página de releases de GitHub
+  [[ -z "$download_url" && -n "$github_path" ]] && download_url="https://github.com/${github_path}/releases/latest"
+
+  # Estado instalado
   inst_path=$(find_installed_path "$app_id")
   installed=false
   estado="A"
   inst_ver=""
   update_available=false
+  avail_ver=""
 
   if [[ -n "$inst_path" && -f "$inst_path" ]]; then
     installed=true
     estado="I"
     installed_count=$((installed_count+1))
     inst_ver=$(extract_version "$(basename "$inst_path")")
-    if ver_newer "$inst_ver" "$ver"; then
+    avail_ver=$(extract_version "$download_url")
+    if ver_newer "$inst_ver" "$avail_ver"; then
       update_available=true
       upd_count=$((upd_count+1))
     fi
   fi
 
-  # simple description
-  desc="AppImage application: $disp"
-
-  # minimal JSON escaping
-  desc=${desc//\\/\\\\}
-  desc=${desc//\"/\\\"}
-  disp=${disp//\\/\\\\}
-  disp=${disp//\"/\\\"}
+  # Escapar campos para JSON
+  name_j=${name//\\/\\\\}; name_j=${name_j//\"/\\\"}
+  desc_j=${desc//\\/\\\\}; desc_j=${desc_j//\"/\\\"}
+  icon_j=${icon_path//\\/\\\\}; icon_j=${icon_j//\"/\\\"}
+  url_j=${download_url//\\/\\\\}; url_j=${url_j//\"/\\\"}
+  github_j=${github_path//\\/\\\\}; github_j=${github_j//\"/\\\"}
 
   [[ $first -eq 0 ]] && echo "," >> "$JSON_FILE"
   first=0
+  total=$((total+1))
 
   cat >> "$JSON_FILE" <<EOF
   {
     "estado": "$estado",
     "id": "$app_id",
-    "nombre": "$disp",
-    "remoto": "archive.org",
-    "descripcion": "$desc",
-    "icono": "$ICON_PATH",
-    "url": "$url",
+    "nombre": "$name_j",
+    "categoria": "$category",
+    "remoto": "appimage.github.io",
+    "descripcion": "$desc_j",
+    "icono": "$icon_j",
+    "url": "$url_j",
+    "github": "$github_j",
     "installed": $installed,
-    "installed_version": "${inst_ver}",
-    "available_version": "${ver}",
+    "installed_version": "$inst_ver",
+    "available_version": "$avail_ver",
     "update_available": $update_available
   }
 EOF
-done < "$TMP_PICKED"
+
+done < <(jq -c '.items[]' "$FEED_CACHE")
 
 echo "]" >> "$JSON_FILE"
-echo "Done. File generated: $JSON_FILE"
-echo "• Apps: $total  |  Installed: $installed_count  |  Updates available: $upd_count"
+
+echo ""
+echo "✔ Generado: $JSON_FILE"
+echo "• Apps: $total  |  Instaladas: $installed_count  |  Actualizaciones: $upd_count"
+echo "• Íconos cacheados en: $ICON_CACHE_DIR"

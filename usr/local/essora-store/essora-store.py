@@ -21,8 +21,11 @@ import gi
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, GLib, Gdk, GdkPixbuf, Pango
 import os
+import pty
+import select
 import subprocess
 import socket
+import threading
 from translations import tr, init_translations
 
 
@@ -95,6 +98,10 @@ class ProgressDialog(Gtk.Dialog):
         self.textview.set_right_margin(8)
         self.textview.set_top_margin(8)
         self.textview.set_bottom_margin(8)
+        # #agregado por josejp2424 — soporte PTY para debconf interactivo
+        self._pty_master = None
+        self._input_buffer = ""
+        self.textview.connect("key-press-event", self._on_key_press)
         
 
         font_desc = Pango.FontDescription.from_string("monospace 9")
@@ -198,6 +205,63 @@ class ProgressDialog(Gtk.Dialog):
             self.pulse_progress()
             return True
         return False  
+
+
+    def set_pty_master(self, fd):
+        """Conectar el PTY master para enviar input del usuario al proceso."""
+        self._pty_master = fd
+        self.textview.set_editable(True)
+        self.textview.set_cursor_visible(True)
+        self._input_buffer = ""
+
+    def clear_pty(self):
+        """Desconectar PTY cuando el proceso termina."""
+        self._pty_master = None
+        self._input_buffer = ""
+        self.textview.set_editable(False)
+        self.textview.set_cursor_visible(False)
+
+    def _on_key_press(self, widget, event):
+        """Capturar teclas y enviarlas al proceso via PTY."""
+        if self._pty_master is None:
+            return False  # no PTY activo — comportamiento normal (no editable)
+
+        import gi
+        gi.require_version("Gdk", "3.0")
+        from gi.repository import Gdk
+
+        keyval = event.keyval
+        try:
+            if keyval == Gdk.KEY_Return or keyval == Gdk.KEY_KP_Enter:
+                # Enviar la línea al proceso
+                line = self._input_buffer + "\n"
+                os.write(self._pty_master, line.encode())
+                # Mostrar el Enter en la consola
+                self.append_text("")
+                self._input_buffer = ""
+                return True
+            elif keyval == Gdk.KEY_BackSpace:
+                if self._input_buffer:
+                    self._input_buffer = self._input_buffer[:-1]
+                    # Borrar último char del textview
+                    buf = self.textbuffer
+                    end = buf.get_end_iter()
+                    if not end.starts_line():
+                        start = end.copy()
+                        start.backward_char()
+                        buf.delete(start, end)
+                return True
+            else:
+                char = event.string
+                if char and char.isprintable():
+                    self._input_buffer += char
+                    # Mostrar en el textview
+                    end = self.textbuffer.get_end_iter()
+                    self.textbuffer.insert(end, char)
+                    return True
+        except Exception as e:
+            print(f"[PTY key] {e}")
+        return False
 
 
 class SimpleProgressDialog:
@@ -1796,6 +1860,26 @@ class EssoraStoreWindow(Gtk.Window):
     def hide_progress_dialog(self):
         SimpleProgressDialog.hide()
         return False
+
+    def enable_pty_input(self, master_fd):
+        """Activar input PTY en el diálogo de progreso — para debconf interactivo.
+        #agregado por josejp2424
+        """
+        if SimpleProgressDialog._instance:
+            SimpleProgressDialog._instance.set_pty_master(master_fd)
+            SimpleProgressDialog.update_text(
+                "─── Interactive mode: type your answer and press Enter ───"
+            )
+        return False
+
+    def disable_pty_input(self):
+        """Desactivar input PTY cuando el proceso termina.
+        #agregado por josejp2424
+        """
+        if SimpleProgressDialog._instance:
+            SimpleProgressDialog._instance.clear_pty()
+        return False
+
 
     def _ensure_search_popover(self):
         if self._search_popover is not None:

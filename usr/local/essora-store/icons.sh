@@ -1,4 +1,5 @@
 #!/bin/bash
+# josejp2424
 #
 # Copyright (C) 2025 josejp2424
 #
@@ -54,10 +55,12 @@ if [ $NEED_UPDATE -eq 1 ]; then
     # Start JSON
     echo "{" > "$OUTPUT_FILE"
 
+    # Function to find icons in all hicolor subdirectories
     find_icons() {
         local count=0
         local temp_file=$(mktemp)
         
+        # Search in all icon sizes (16x16, 22x22, 24x24, 32x32, 48x48, 64x64, 128x128, scalable)
         for size_dir in "$ICON_BASE"/hicolor/*x* "$ICON_BASE"/hicolor/scalable; do
             if [ -d "$size_dir/apps" ]; then
                 echo "Searching in: $size_dir/apps" >&2
@@ -65,6 +68,7 @@ if [ $NEED_UPDATE -eq 1 ]; then
             fi
         done
         
+        # Also search in /icons directly (some apps might put icons there)
         if [ -d "$ICON_BASE" ]; then
             find "$ICON_BASE" -type f \( -name "*.svg" -o -name "*.png" -o -name "*.jpg" -o -name "*.jpeg" \) 2>/dev/null | grep -v "hicolor" >> "$temp_file"
         fi
@@ -76,11 +80,14 @@ if [ $NEED_UPDATE -eq 1 ]; then
             
             # Process each unique icon
             while read -r icon_path; do
+                # Extract base name without extension
                 icon_name=$(basename "$icon_path" | sed 's/\.[^.]*$//')
+                # Clean name (remove special characters)
                 icon_name=$(echo "$icon_name" | sed 's/[^a-zA-Z0-9._-]/_/g')
                 
                 ((count++))
                 
+                # Add to JSON (no comma on last element)
                 if [ $count -eq $total_files ]; then
                     echo "  \"$icon_name\": \"$icon_path\"" >> "$OUTPUT_FILE"
                 else
@@ -114,18 +121,20 @@ if [ $NEED_UPDATE -eq 1 ]; then
     echo "JSON created at: $OUTPUT_FILE"
     echo "Total icons processed: $total_icons"
 
+    # Show some statistics if icons were found
     if [ "$total_icons" -gt 0 ]; then
         echo ""
         echo "Statistics:"
         echo "   - Total icons: $total_icons"
         echo "   - Base directory: $ICON_BASE"
         
+        # Show some examples
         echo ""
         echo "First 5 icons found:"
         head -5 "$OUTPUT_FILE" | grep -v "{" | grep -v "}" | sed 's/^/   /'
     fi
 else
-
+    # Just show info about existing cache
     if [ -f "$OUTPUT_FILE" ]; then
         total_icons=$(grep -c ":" "$OUTPUT_FILE" 2>/dev/null || echo "0")
         echo "Using existing cache from $LAST_UPDATE"

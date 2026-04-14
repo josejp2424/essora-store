@@ -33,7 +33,7 @@ except Exception:
 
 class EssoraAboutDialog:
     def __init__(self):
-        self.version = "3.3-1"
+        self.version = "3.6-1"
         self.author = "josejp2424"
         self.license_type = "GPL-3.0-or-later"
         self.icon_path = "/usr/local/essora-store/essora-store.png"
