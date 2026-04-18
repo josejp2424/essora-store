@@ -77,7 +77,7 @@ class PackageRow(Gtk.ListBoxRow):
           instalado  -> reinstalar + desinstalar (sin botón instalar)
           no instalado -> instalar (sin reinstalar/desinstalar)
     """
-    def __init__(self, app, activity):
+    def __init__(self, app, activity, selectable=False, on_selection_changed=None):
         super().__init__()
         global _css_loaded
         if not _css_loaded:
@@ -86,6 +86,10 @@ class PackageRow(Gtk.ListBoxRow):
 
         self.app = app
         self.activity = activity
+        # #agregado por josejp2424 — soporte selección múltiple (solo DEB)
+        self.selectable = bool(selectable)
+        self._on_selection_changed = on_selection_changed
+        self.check_select = None
 
         self.set_selectable(False)
         self.set_activatable(False)
@@ -101,11 +105,23 @@ class PackageRow(Gtk.ListBoxRow):
         inner.get_style_context().add_class("pkg-inner")
         frame.add(inner)
 
-        icon_wrap = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        icon_wrap = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4)
         icon_wrap.set_size_request(66, -1)
         icon_wrap.set_halign(Gtk.Align.CENTER)
         icon_wrap.set_valign(Gtk.Align.CENTER)
         inner.pack_start(icon_wrap, False, False, 0)
+
+        # #agregado por josejp2424 — checkbox encima del icono para selección múltiple
+        if self.selectable:
+            self.check_select = Gtk.CheckButton()
+            self.check_select.set_halign(Gtk.Align.CENTER)
+            self.check_select.set_tooltip_text(tr("Select for batch install"))
+            try:
+                self.check_select.set_can_focus(False)
+            except Exception:
+                pass
+            self.check_select.connect("toggled", self._on_check_toggled)
+            icon_wrap.pack_start(self.check_select, False, False, 0)
 
         img = Gtk.Image()
         pix = _pixbuf_from_file(getattr(app, "icon_path", ""), 56)
@@ -293,6 +309,29 @@ class PackageRow(Gtk.ListBoxRow):
             self.btn_reinstall.hide()
             self.btn_uninstall.hide()
             self.badge_installed.hide()
+
+        # #agregado por josejp2424 — el check solo tiene sentido si NO está instalado
+        if self.check_select is not None:
+            if installed:
+                self.check_select.set_active(False)
+                self.check_select.hide()
+            else:
+                self.check_select.show()
+
+    # #agregado por josejp2424 — helpers para selección múltiple
+    def _on_check_toggled(self, _btn):
+        if callable(self._on_selection_changed):
+            try:
+                self._on_selection_changed(self)
+            except Exception:
+                pass
+
+    def is_selected(self) -> bool:
+        return bool(self.check_select and self.check_select.get_active())
+
+    def set_selected(self, value: bool):
+        if self.check_select is not None:
+            self.check_select.set_active(bool(value))
 
     def _on_install(self, *_):
         self._set_busy(True)

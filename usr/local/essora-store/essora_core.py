@@ -516,7 +516,6 @@ class ActivityManager:
         )
         os.close(slave_fd)
 
-        # Conectar PTY master al diálogo para input interactivo
         GLib.idle_add(self.gui.enable_pty_input, master_fd)
 
         current_progress = progress_start
@@ -538,7 +537,7 @@ class ActivityManager:
                             line = line.strip()
                             if line and not line.startswith("pmstatus:"):
                                 GLib.idle_add(self.gui.update_progress_text, line)
-                            # parse progress
+
                             prog = parse_apt_progress(line)
                             if prog is not None:
                                 scaled = progress_start + prog * (progress_end - progress_start)
@@ -548,7 +547,7 @@ class ActivityManager:
                         break
 
                 if proc.poll() is not None:
-                    # drain remaining output
+
                     try:
                         while True:
                             r2, _, _ = select.select([master_fd], [], [], 0.05)
@@ -599,6 +598,23 @@ class ActivityManager:
         elif app.pkg_type == "appimage":
             self._bg(lambda: self._install_appimage(app), app)
 
+    # #agregado por josejp2424 — instalación múltiple de paquetes DEB en una sola llamada apt-get
+    def install_many_deb(self, app_ids):
+        """Instala varios paquetes DEB con un único 'apt-get install pkg1 pkg2 ...'.
+        Esto permite que APT resuelva todas las dependencias juntas y es mucho
+        más rápido que llamar install() N veces.
+        """
+        ids = [str(x).strip() for x in (app_ids or []) if str(x).strip()]
+        seen = set()
+        uniq = []
+        for i in ids:
+            if i not in seen:
+                seen.add(i)
+                uniq.append(i)
+        if not uniq:
+            return
+        self._bg(lambda: self._install_many_deb_worker(uniq), None)
+
     def uninstall(self, app: Application):
         if app.pkg_type == "flatpak":
             self._bg(lambda: self._uninstall_flatpak(app), app)
@@ -632,7 +648,6 @@ class ActivityManager:
         GLib.idle_add(self.gui.show_progress_dialog, tr("Fix Broken Packages"), "deb")
         GLib.idle_add(self.gui.update_progress_bar, 0.0)
 
-        # --- Paso 1: dpkg --configure -a ---
         GLib.idle_add(self.gui.update_progress_text, tr("Step 1: dpkg --configure -a ..."))
         p1 = subprocess.Popen(
             [
@@ -658,7 +673,6 @@ class ActivityManager:
             GLib.idle_add(self.gui.hide_progress_dialog)
             raise Exception(tr("dpkg --configure -a failed (code {code})", code=p1.returncode))
 
-        # --- Paso 2: apt-get --fix-broken install ---
         GLib.idle_add(self.gui.update_progress_text, tr("Step 2: apt-get --fix-broken install ..."))
         p2 = subprocess.Popen(
             [
@@ -740,7 +754,6 @@ class ActivityManager:
         GLib.idle_add(self.gui.show_progress_dialog, tr("Updating all DEB packages"), "deb")
         GLib.idle_add(self.gui.update_progress_text, tr("Updating package lists..."))
 
-        # Step 1: apt-get update (sin PTY, no tiene interacción)
         p1 = subprocess.Popen(
             ["apt-get", "update"],
             stdout=subprocess.PIPE,
@@ -760,8 +773,6 @@ class ActivityManager:
         GLib.idle_add(self.gui.update_progress_text, tr("Upgrading packages..."))
         GLib.idle_add(self.gui.update_progress_bar, 0.1)
 
-        # Step 2: apt-get upgrade via PTY — debconf puede mostrar preguntas
-        # El usuario puede responder directamente en el diálogo de progreso
         cmd = [
             "apt-get", "upgrade", "-y",
             "-o", "Dpkg::Options::=--force-confold",
@@ -1003,6 +1014,42 @@ class ActivityManager:
             pass
         GLib.idle_add(self.gui.hide_progress_dialog)
 
+    # #agregado por josejp2424 — worker para instalación múltiple DEB
+    def _install_many_deb_worker(self, app_ids):
+        from gi.repository import GLib
+
+        env = os.environ.copy()
+        env["DEBIAN_FRONTEND"] = "noninteractive"
+
+        self._run_dpkg_configure()
+
+        cmd = [
+            "apt-get", "install", "-y",
+            "-o", "Dpkg::Options::=--force-confold",
+            "-o", "Dpkg::Options::=--force-confdef",
+        ] + list(app_ids)
+
+        n = len(app_ids)
+        preview = ", ".join(app_ids[:3]) + (" …" if n > 3 else "")
+        GLib.idle_add(
+            self.gui.show_progress_dialog,
+            tr("Installing {n} packages: {preview}", n=n, preview=preview),
+            "deb",
+        )
+
+        rc = self._run_deb_pty(cmd, env, progress_start=0.0, progress_end=0.99)
+
+        if rc != 0:
+            raise Exception(tr("Error installing DEB (code {code})", code=rc))
+
+        GLib.idle_add(self.gui.update_progress_bar, 1.0)
+        self._reload_catalog("deb")
+        try:
+            subprocess.run(["/usr/local/bin/fixmenu"], check=False, timeout=5)
+        except Exception:
+            pass
+        GLib.idle_add(self.gui.hide_progress_dialog)
+
     def _uninstall_deb(self, app: Application):
         from gi.repository import GLib
 
@@ -1041,15 +1088,10 @@ class ActivityManager:
         para obtener el primer asset .AppImage del último release."""
         url = app.download_url or ""
 
-        # URL directa a un archivo — usar tal cual
         if url.lower().endswith(".appimage"):
             return url
 
-        # URL de página de releases — resolver via GitHub API
         github = getattr(app, "remote", "") or ""
-        # el campo github está en download_url como https://github.com/owner/repo/releases
-        # o en el campo 'remote' como 'appimage.github.io'
-        # Extraer owner/repo de la URL
         import re as _re
         m = _re.search(r"github\.com/([^/]+/[^/]+?)(?:/releases.*)?$", url)
         if not m and hasattr(app, "download_url"):
@@ -1064,7 +1106,6 @@ class ActivityManager:
                 with urllib.request.urlopen(req, timeout=10) as resp:
                     data = _json.loads(resp.read())
                 assets = data.get("assets", [])
-                # Preferir x86_64 AppImage
                 for asset in assets:
                     name = asset.get("name", "")
                     if name.endswith(".AppImage") and "x86_64" in name:
@@ -1076,7 +1117,6 @@ class ActivityManager:
             except Exception as e:
                 print(f"[AppImage] GitHub API error for {repo_path}: {e}")
 
-        # Fallback: devolver la URL original (puede fallar pero al menos muestra el error)
         return url
 
     def _install_appimage(self, app: Application):

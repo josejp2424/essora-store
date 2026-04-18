@@ -224,7 +224,7 @@ class ProgressDialog(Gtk.Dialog):
     def _on_key_press(self, widget, event):
         """Capturar teclas y enviarlas al proceso via PTY."""
         if self._pty_master is None:
-            return False  # no PTY activo — comportamiento normal (no editable)
+            return False  
 
         import gi
         gi.require_version("Gdk", "3.0")
@@ -233,17 +233,14 @@ class ProgressDialog(Gtk.Dialog):
         keyval = event.keyval
         try:
             if keyval == Gdk.KEY_Return or keyval == Gdk.KEY_KP_Enter:
-                # Enviar la línea al proceso
                 line = self._input_buffer + "\n"
                 os.write(self._pty_master, line.encode())
-                # Mostrar el Enter en la consola
                 self.append_text("")
                 self._input_buffer = ""
                 return True
             elif keyval == Gdk.KEY_BackSpace:
                 if self._input_buffer:
                     self._input_buffer = self._input_buffer[:-1]
-                    # Borrar último char del textview
                     buf = self.textbuffer
                     end = buf.get_end_iter()
                     if not end.starts_line():
@@ -255,7 +252,6 @@ class ProgressDialog(Gtk.Dialog):
                 char = event.string
                 if char and char.isprintable():
                     self._input_buffer += char
-                    # Mostrar en el textview
                     end = self.textbuffer.get_end_iter()
                     self.textbuffer.insert(end, char)
                     return True
@@ -628,6 +624,37 @@ class BackendPage(Gtk.Box):
         root.set_margin_start(10)
         root.set_margin_end(10)
         if tab in ("Available", "Installed", "All"):  
+            # #agregado por josejp2424 — barra de acciones para selección múltiple (solo DEB)
+            multi_bar = None
+            multi_count_label = None
+            btn_install_sel = None
+            btn_select_all = None
+            btn_clear_sel = None
+            if self.pkg_type == "deb":
+                multi_bar = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=8)
+                multi_bar.set_margin_bottom(4)
+
+                btn_install_sel = Gtk.Button(label=tr("Install selected"))
+                btn_install_sel.get_style_context().add_class("suggested-action")
+                btn_install_sel.set_sensitive(False)
+                btn_install_sel.connect("clicked", lambda *_: self._on_install_selected())
+                multi_bar.pack_start(btn_install_sel, False, False, 0)
+
+                btn_select_all = Gtk.Button(label=tr("Select all"))
+                btn_select_all.connect("clicked", lambda *_: self._on_select_all_visible(True))
+                multi_bar.pack_start(btn_select_all, False, False, 0)
+
+                btn_clear_sel = Gtk.Button(label=tr("Clear selection"))
+                btn_clear_sel.connect("clicked", lambda *_: self._on_select_all_visible(False))
+                multi_bar.pack_start(btn_clear_sel, False, False, 0)
+
+                multi_count_label = Gtk.Label(label=tr("{n} selected", n=0))
+                multi_count_label.set_xalign(1.0)
+                multi_count_label.get_style_context().add_class("dim-label")
+                multi_bar.pack_end(multi_count_label, True, True, 0)
+
+                root.pack_start(multi_bar, False, False, 0)
+
             listbox = Gtk.ListBox()
             listbox.set_selection_mode(Gtk.SelectionMode.NONE)
             scroll = Gtk.ScrolledWindow()
@@ -641,7 +668,18 @@ class BackendPage(Gtk.Box):
             status = Gtk.Label(label="")
             status.set_xalign(0)
             root.pack_start(status, False, False, 0)
-            return {"root": root, "list": listbox, "more": btn_more, "status": status}
+            return {
+                "root": root,
+                "list": listbox,
+                "more": btn_more,
+                "status": status,
+                # #agregado por josejp2424 — refs para la barra de selección múltiple
+                "multi_bar": multi_bar,
+                "multi_count_label": multi_count_label,
+                "btn_install_sel": btn_install_sel,
+                "btn_select_all": btn_select_all,
+                "btn_clear_sel": btn_clear_sel,
+            }
         if tab == "Update":
             h = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=8)
             btn = Gtk.Button(label=tr("Update All"))
@@ -682,7 +720,6 @@ class BackendPage(Gtk.Box):
                 root.pack_start(scroll, True, True, 0)
                 return {"root": root, "list": listbox}
             elif self.pkg_type == "appimage":
-                # Panel de actualización de catálogo AppImage
                 vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=16)
                 vbox.set_valign(Gtk.Align.CENTER)
                 vbox.set_halign(Gtk.Align.CENTER)
@@ -752,7 +789,6 @@ class BackendPage(Gtk.Box):
         self.load_more("All")
         self.refresh_updates()
         self.refresh_repos()
-        # Conectar botón de actualización de catálogo AppImage (una sola vez)
         if self.pkg_type == "appimage" and not getattr(self, "_catalog_btn_connected", False):
             btn = self.tabs["Repos"].get("btn_update_catalog")
             if btn:
@@ -777,7 +813,17 @@ class BackendPage(Gtk.Box):
         lb = self.tabs[tab]["list"]
         
         for app in src[off:end]:
-            lb.add(PackageRow(app, self.activity))
+            # #editado por josejp2424 — selección múltiple solo en DEB
+            if self.pkg_type == "deb":
+                row = PackageRow(
+                    app,
+                    self.activity,
+                    selectable=True,
+                    on_selection_changed=self._on_row_selection_changed,
+                )
+            else:
+                row = PackageRow(app, self.activity)
+            lb.add(row)
         
         lb.show_all()
         self._offset[tab] = end
@@ -795,6 +841,59 @@ class BackendPage(Gtk.Box):
         self.set_apps(self.catalog.all_apps)
         
         self.refresh_updates()
+
+    # #agregado por josejp2424 — helpers para selección múltiple (solo DEB)
+    def _iter_selectable_rows(self):
+        if self.pkg_type != "deb":
+            return
+        tab = self.tabs.get("All")
+        if not tab:
+            return
+        lb = tab.get("list")
+        if not lb:
+            return
+        for child in lb.get_children():
+            if isinstance(child, PackageRow) and child.check_select is not None:
+                yield child
+
+    def _on_row_selection_changed(self, _row):
+        if self.pkg_type != "deb":
+            return
+        tab = self.tabs.get("All")
+        if not tab:
+            return
+        selected = [r for r in self._iter_selectable_rows() if r.is_selected()]
+        n = len(selected)
+        lbl = tab.get("multi_count_label")
+        if lbl:
+            lbl.set_text(tr("{n} selected", n=n))
+        btn = tab.get("btn_install_sel")
+        if btn:
+            btn.set_sensitive(n > 0)
+
+    def _on_select_all_visible(self, value: bool):
+        if self.pkg_type != "deb":
+            return
+        for r in self._iter_selectable_rows():
+            if r.check_select is not None and r.check_select.get_visible():
+                r.set_selected(value)
+        self._on_row_selection_changed(None)
+
+    def _on_install_selected(self):
+        if self.pkg_type != "deb":
+            return
+        ids = [r.app.app_id for r in self._iter_selectable_rows() if r.is_selected()]
+        if not ids:
+            return
+        try:
+            self.activity.install_many_deb(ids)
+        except Exception as e:
+            print(f"[essora-store] install_many_deb failed: {e}")
+            return
+        for r in self._iter_selectable_rows():
+            r.set_selected(False)
+        self._on_row_selection_changed(None)
+
     def refresh_updates(self):
         lb = self.tabs["Update"]["list"]
         for child in lb.get_children():
@@ -927,7 +1026,6 @@ class BackendPage(Gtk.Box):
 
         def _worker():
             try:
-                # Borrar last-update.txt para forzar actualización aunque sea el mismo día
                 import os
                 last_file = "/usr/local/essora-store/last-update.txt"
                 try:
@@ -959,7 +1057,6 @@ class BackendPage(Gtk.Box):
                 else:
                     lbl.set_text(tr("Update failed"))
             if ok:
-                # Refrescar la lista AppImage con el nuevo JSON
                 self.refresh_after_activity()
             return False
 
