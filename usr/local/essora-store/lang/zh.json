@@ -116,5 +116,16 @@
   "• AppImage integration": "• 集成 AppImage",
   "• Unified interface for all package types": "• 统一管理所有软件包类型",
   "• Easy to use and intuitive": "• 简单易用、直观",
-  "© 2025 josejp2424. All rights reserved.": "© 2025 josejp2424. 保留所有权利。"
+  "© 2025 josejp2424. All rights reserved.": "© 2025 josejp2424. 保留所有权利。",
+  "List view": "列表视图",
+  "Grid view": "网格视图",
+  "Sandboxed apps from Flathub": "来自 Flathub 的沙盒应用",
+  "Native Debian packages": "原生 Debian 软件包",
+  "Portable, no installation": "便携式,无需安装",
+  "Open {name}": "打开 {name}",
+  "Explore": "浏览",
+  "Essora Store manages Flatpak…": "Essora Store 管理 Flatpak…",
+  "…native DEB packages…": "…原生 DEB 软件包…",
+  "…and portable AppImages.": "…以及便携式 AppImage。",
+  "All your software, one place.": "所有软件,集于一处。"
 }

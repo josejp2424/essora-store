@@ -69,6 +69,8 @@ class Application:
     installed_version: str = ""
     available_version: str = ""
     update_available: bool = False
+    # #agregado por josejp2424 — path 'owner/repo' de GitHub para resolver URL lazy
+    github_path: str = ""
 
 
 def parse_apt_progress(line):
@@ -319,7 +321,11 @@ class CatalogManager:
                 icon_path = str(GENERIC_APPIMAGE_ICON)
             remote = str(it.get("remoto") or it.get("repo") or "appimage").strip()
             download_url = str(it.get("url") or it.get("download_url") or "").strip()
-            out.append(Application(app_id, name, summary, category, "appimage", icon_path, remote, False, download_url))
+            # #agregado por josejp2424 — leer github_path para resolución lazy en _resolve_appimage_url
+            github_path = str(it.get("github") or it.get("github_path") or "").strip()
+            app_obj = Application(app_id, name, summary, category, "appimage", icon_path, remote, False, download_url)
+            app_obj.github_path = github_path
+            out.append(app_obj)
         return out
 
     def refresh_installed_flags(self, apps: List[Application]) -> None:
@@ -516,6 +522,7 @@ class ActivityManager:
         )
         os.close(slave_fd)
 
+
         GLib.idle_add(self.gui.enable_pty_input, master_fd)
 
         current_progress = progress_start
@@ -605,6 +612,7 @@ class ActivityManager:
         más rápido que llamar install() N veces.
         """
         ids = [str(x).strip() for x in (app_ids or []) if str(x).strip()]
+        # quitar duplicados preservando orden
         seen = set()
         uniq = []
         for i in ids:
@@ -648,6 +656,7 @@ class ActivityManager:
         GLib.idle_add(self.gui.show_progress_dialog, tr("Fix Broken Packages"), "deb")
         GLib.idle_add(self.gui.update_progress_bar, 0.0)
 
+
         GLib.idle_add(self.gui.update_progress_text, tr("Step 1: dpkg --configure -a ..."))
         p1 = subprocess.Popen(
             [
@@ -672,6 +681,7 @@ class ActivityManager:
         if p1.returncode != 0:
             GLib.idle_add(self.gui.hide_progress_dialog)
             raise Exception(tr("dpkg --configure -a failed (code {code})", code=p1.returncode))
+
 
         GLib.idle_add(self.gui.update_progress_text, tr("Step 2: apt-get --fix-broken install ..."))
         p2 = subprocess.Popen(
@@ -772,6 +782,7 @@ class ActivityManager:
 
         GLib.idle_add(self.gui.update_progress_text, tr("Upgrading packages..."))
         GLib.idle_add(self.gui.update_progress_bar, 0.1)
+
 
         cmd = [
             "apt-get", "upgrade", "-y",
@@ -1083,46 +1094,176 @@ class ActivityManager:
 
 
     def _resolve_appimage_url(self, app: Application) -> str:
-        """Resuelve la URL directa del .AppImage.
-        Si la URL es una página de releases de GitHub, consulta la API
-        para obtener el primer asset .AppImage del último release."""
-        url = app.download_url or ""
+        """Resuelve la URL directa del .AppImage de forma robusta.
 
-        if url.lower().endswith(".appimage"):
+        #editado por josejp2424 — resolución lazy (al instalar), con 3 estrategias
+        en cascada para evitar fallar por rate limit de GitHub:
+          1) URL directa si ya termina en .appimage.
+          2) GitHub API (/releases/latest) — 60 req/h sin token, 5000/h con token.
+          3) Scrapear el HTML de /releases/latest/ (sin rate limit significativo).
+
+        Devuelve "" si no se pudo resolver — _install_appimage lo maneja.
+        """
+        url = (app.download_url or "").strip()
+
+
+        if url.lower().split("?")[0].split("#")[0].endswith(".appimage"):
             return url
 
-        github = getattr(app, "remote", "") or ""
         import re as _re
-        m = _re.search(r"github\.com/([^/]+/[^/]+?)(?:/releases.*)?$", url)
-        if not m and hasattr(app, "download_url"):
-            m = _re.search(r"github\.com/([^/]+/[^/]+?)(?:/releases.*)?$", app.download_url or "")
+        repo_path = ""
 
-        if m:
-            repo_path = m.group(1)
-            api_url = f"https://api.github.com/repos/{repo_path}/releases/latest"
-            try:
-                import urllib.request, json as _json
-                req = urllib.request.Request(api_url, headers={"User-Agent": "essora-store"})
-                with urllib.request.urlopen(req, timeout=10) as resp:
-                    data = _json.loads(resp.read())
-                assets = data.get("assets", [])
-                for asset in assets:
-                    name = asset.get("name", "")
-                    if name.endswith(".AppImage") and "x86_64" in name:
-                        return asset["browser_download_url"]
-                # Cualquier AppImage
-                for asset in assets:
-                    if asset.get("name", "").endswith(".AppImage"):
-                        return asset["browser_download_url"]
-            except Exception as e:
-                print(f"[AppImage] GitHub API error for {repo_path}: {e}")
+        # #agregado por josejp2424 — prioridad al campo github_path del JSON
+        gp = (getattr(app, "github_path", "") or "").strip()
+        if gp:
+            gp = gp.rstrip("/")
+            if _re.match(r"^[^/\s]+/[^/\s]+$", gp):
+                repo_path = gp
 
-        return url
+        if not repo_path:
+            candidates = [
+                url,
+                getattr(app, "download_url", "") or "",
+            ]
+
+            for attr in ("github", "remote"):
+                v = getattr(app, attr, "")
+                if isinstance(v, str) and v:
+                    candidates.append(v)
+
+            for c in candidates:
+                if not c:
+                    continue
+                m = _re.search(r"github\.com/([^/\s]+/[^/\s]+?)(?:/releases.*)?/?$", c)
+                if m:
+                    repo_path = m.group(1).strip().rstrip("/")
+                    repo_path = _re.sub(r"\.git$", "", repo_path)
+                    break
+
+                if _re.match(r"^[^/\s]+/[^/\s]+$", c.strip()):
+                    repo_path = c.strip()
+                    break
+
+        if not repo_path:
+            return ""
+
+
+        resolved = self._resolve_via_github_api(repo_path)
+        if resolved:
+            return resolved
+
+
+        resolved = self._resolve_via_github_html(repo_path)
+        if resolved:
+            return resolved
+
+        return ""
+
+    def _resolve_via_github_api(self, repo_path: str) -> str:
+        """Intenta resolver vía api.github.com/repos/<repo>/releases/latest.
+        Devuelve URL directa al .AppImage o "" si falla / rate-limited."""
+        import urllib.request, urllib.error, json as _json, time as _time
+
+        api_url = f"https://api.github.com/repos/{repo_path}/releases/latest"
+        headers = {
+            "User-Agent": "essora-store",
+            "Accept": "application/vnd.github+json",
+        }
+        token = os.environ.get("GITHUB_TOKEN", "").strip()
+        if token:
+            headers["Authorization"] = f"Bearer {token}"
+
+        try:
+            req = urllib.request.Request(api_url, headers=headers)
+            with urllib.request.urlopen(req, timeout=15) as resp:
+                data = _json.loads(resp.read())
+        except urllib.error.HTTPError as e:
+
+            print(f"[AppImage] GitHub API HTTP {e.code} for {repo_path}")
+            return ""
+        except Exception as e:
+            print(f"[AppImage] GitHub API error for {repo_path}: {e}")
+            return ""
+
+        assets = data.get("assets", []) or []
+
+        for asset in assets:
+            name = (asset.get("name") or "").lower()
+            if name.endswith(".appimage") and ("x86_64" in name or "x86-64" in name or "amd64" in name):
+                return asset.get("browser_download_url", "") or ""
+
+        for asset in assets:
+            name = (asset.get("name") or "").lower()
+            if name.endswith(".appimage"):
+                return asset.get("browser_download_url", "") or ""
+        return ""
+
+    def _resolve_via_github_html(self, repo_path: str) -> str:
+        """Fallback: scrapear la página HTML de /releases/ sin API.
+        Evita el rate limit (60/h) de la API. GitHub carga los assets de
+        releases lazy via /releases/expanded_assets/<tag>, así que primero
+        seguimos el redirect de /releases/latest para obtener el tag, y
+        después pegamos a expanded_assets para obtener los nombres reales.
+        """
+        import urllib.request, urllib.error
+        import re as _re
+
+
+        tag = ""
+        try:
+            url = f"https://github.com/{repo_path}/releases/latest"
+            req = urllib.request.Request(url, headers={"User-Agent": "essora-store"})
+            with urllib.request.urlopen(req, timeout=15) as resp:
+                final_url = resp.geturl()
+            m = _re.search(r"/releases/tag/([^/?#]+)", final_url)
+            if m:
+                tag = m.group(1)
+        except Exception as e:
+            print(f"[AppImage] release tag lookup failed for {repo_path}: {e}")
+            return ""
+
+        if not tag:
+            return ""
+
+
+        assets_url = f"https://github.com/{repo_path}/releases/expanded_assets/{tag}"
+        try:
+            req = urllib.request.Request(assets_url, headers={"User-Agent": "essora-store"})
+            with urllib.request.urlopen(req, timeout=15) as resp:
+                html = resp.read().decode("utf-8", errors="replace")
+        except Exception as e:
+            print(f"[AppImage] expanded_assets failed for {repo_path}: {e}")
+            return ""
+
+
+        matches = _re.findall(
+            r'href="(/[^"]+?\.appimage)"', html, flags=_re.IGNORECASE
+        )
+
+        if not matches:
+            return ""
+
+
+        for href in matches:
+            low = href.lower()
+            if "x86_64" in low or "x86-64" in low or "amd64" in low:
+                return "https://github.com" + href
+
+
+        return "https://github.com" + matches[0]
 
     def _install_appimage(self, app: Application):
         from gi.repository import GLib
         
         url = self._resolve_appimage_url(app)
+
+        # #agregado por josejp2424 — abortar si no se pudo resolver
+        if not url:
+            raise Exception(tr(
+                "Could not find an AppImage download for '{app}'. "
+                "The project may not publish AppImages on GitHub, or may have moved.",
+                app=app.name
+            ))
 
         target_dir = APPIMAGE_ROOT / app.app_id
         target_dir.mkdir(parents=True, exist_ok=True)
@@ -1132,8 +1273,17 @@ class ActivityManager:
         GLib.idle_add(self.gui.update_progress_text, tr("URL: {url}", url=url))
         GLib.idle_add(self.gui.update_progress_text, tr("Target: {target}", target=target))
         
+        # #editado por josejp2424 — -L sigue redirects (común en GitHub),
+        # --user-agent evita rechazos de algunos servidores.
         process = subprocess.Popen(
-            ["wget", "--progress=bar:force", "-O", str(target), url],
+            [
+                "wget",
+                "-L",
+                "--user-agent=essora-store",
+                "--progress=bar:force",
+                "-O", str(target),
+                url,
+            ],
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             text=True,
@@ -1160,7 +1310,40 @@ class ActivityManager:
         process.wait()
         
         if process.returncode != 0:
+            # #agregado por josejp2424 — limpiar archivo parcial
+            try:
+                if target.exists():
+                    target.unlink()
+            except Exception:
+                pass
             raise Exception(tr("Error downloading AppImage"))
+
+        # #agregado por josejp2424 — validar que el archivo es un binario ELF real.
+        # Si wget terminó OK pero el servidor devolvió HTML (redirect roto, error
+        # page), los primeros bytes NO serán '\x7fELF' y hay que abortar.
+        try:
+            with open(target, "rb") as _f:
+                magic = _f.read(4)
+        except Exception:
+            magic = b""
+
+        if magic[:4] != b"\x7fELF":
+            hint = ""
+            try:
+                with open(target, "rb") as _f:
+                    head = _f.read(200).decode("utf-8", errors="replace").strip().lower()
+                if "<html" in head or "<!doctype" in head:
+                    hint = " (server returned HTML instead of the binary)"
+            except Exception:
+                pass
+            try:
+                target.unlink()
+            except Exception:
+                pass
+            raise Exception(tr(
+                "Downloaded file is not a valid AppImage{hint}",
+                hint=hint
+            ))
 
         GLib.idle_add(self.gui.update_progress_bar, 0.90)
         GLib.idle_add(self.gui.update_progress_text, tr("Setting permissions..."))

@@ -116,5 +116,16 @@
   "• AppImage integration": "• Integración con AppImage",
   "• Unified interface for all package types": "• Interfaz unificada para todos los tipos de paquetes",
   "• Easy to use and intuitive": "• Fácil de usar e intuitivo",
-  "© 2025 josejp2424. All rights reserved.": "© 2025 josejp2424. Todos los derechos reservados."
+  "© 2025 josejp2424. All rights reserved.": "© 2025 josejp2424. Todos los derechos reservados.",
+  "List view": "Vista de lista",
+  "Grid view": "Vista de cuadrícula",
+  "Sandboxed apps from Flathub": "Apps sandboxed de Flathub",
+  "Native Debian packages": "Paquetes nativos de Debian",
+  "Portable, no installation": "Portables, sin instalación",
+  "Open {name}": "Abrir {name}",
+  "Explore": "Explorar",
+  "Essora Store manages Flatpak…": "Essora Store maneja Flatpak…",
+  "…native DEB packages…": "…paquetes DEB nativos…",
+  "…and portable AppImages.": "…y AppImages portables.",
+  "All your software, one place.": "Todo tu software, en un solo lugar."
 }

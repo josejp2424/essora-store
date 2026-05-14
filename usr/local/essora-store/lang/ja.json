@@ -116,5 +116,16 @@
   "• AppImage integration": "• AppImage 統合",
   "• Unified interface for all package types": "• すべての形式を統合したUI",
   "• Easy to use and intuitive": "• 使いやすく直感的",
-  "© 2025 josejp2424. All rights reserved.": "© 2025 josejp2424. All rights reserved."
+  "© 2025 josejp2424. All rights reserved.": "© 2025 josejp2424. All rights reserved.",
+  "List view": "リスト表示",
+  "Grid view": "グリッド表示",
+  "Sandboxed apps from Flathub": "Flathubのサンドボックスアプリ",
+  "Native Debian packages": "ネイティブDebianパッケージ",
+  "Portable, no installation": "ポータブル、インストール不要",
+  "Open {name}": "{name}を開く",
+  "Explore": "探索",
+  "Essora Store manages Flatpak…": "Essora StoreはFlatpakを管理…",
+  "…native DEB packages…": "…ネイティブDEBパッケージ…",
+  "…and portable AppImages.": "…そしてポータブルAppImage。",
+  "All your software, one place.": "すべてのソフトウェアを一箇所に。"
 }

@@ -10,7 +10,7 @@
   "Fix Broken Packages": "Törött csomagok javítása",
   "Refresh Catalog": "Katalógus frissítése",
   "Available": "Elérhető",
-  "All": "Minden",  
+  "All": "Minden",
   "Installed": "Telepített",
   "Update": "Frissítés",
   "Repos": "Tárolók",
@@ -116,5 +116,16 @@
   "• AppImage integration": "• AppImage integráció",
   "• Unified interface for all package types": "• Egységes felület minden csomagtípushoz",
   "• Easy to use and intuitive": "• Könnyen használható és intuitív",
-  "© 2025 josejp2424. All rights reserved.": "© 2025 josejp2424. Minden jog fenntartva."
+  "© 2025 josejp2424. All rights reserved.": "© 2025 josejp2424. Minden jog fenntartva.",
+  "List view": "Listanézet",
+  "Grid view": "Rácsnézet",
+  "Sandboxed apps from Flathub": "Sandbox alkalmazások a Flathubról",
+  "Native Debian packages": "Natív Debian csomagok",
+  "Portable, no installation": "Hordozható, telepítés nélkül",
+  "Open {name}": "{name} megnyitása",
+  "Explore": "Felfedezés",
+  "Essora Store manages Flatpak…": "Az Essora Store kezeli a Flatpak-ot…",
+  "…native DEB packages…": "…a natív DEB csomagokat…",
+  "…and portable AppImages.": "…és a hordozható AppImage-eket.",
+  "All your software, one place.": "Minden szoftvered, egy helyen."
 }

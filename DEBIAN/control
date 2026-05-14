@@ -1,0 +1,29 @@
+Package: essora-store
+Maintainer: josejp2424 <puppylinuxjosejp2424@gmail.com>
+Architecture: amd64
+Version: 4.2-1
+Installed-Size: 116457
+Depends: python3, python3-gi, gir1.2-gtk-3.0, flatpak, apt, wget, gir1.2-gdkpixbuf-2.0, gir1.2-pango-1.0
+Provides: package-manager
+Section: utils
+Priority: optional
+Homepage: https://sourceforge.net/projects/essora/
+Description: Comprehensive multi-format package manager for Essora Linux
+ Essora Store is a unified package management application that provides
+ a modern GTK3 interface for installing, updating, and managing software
+ packages across multiple formats including Flatpak, DEB, and AppImage.
+ .
+ Key Features:
+  * Flatpak package support with automatic repository management
+  * DEB package management with APT integration
+  * AppImage application integration and management
+  * Unified search across all package types
+  * Individual and batch package updates
+  * Multi-language support (English, Spanish, Portuguese, French, etc.)
+  * Modern, intuitive user interface with progress tracking
+  * Automatic catalog refresh after operations
+ .
+ Essora Store simplifies software management on Essora Linux by providing
+ a single application to handle all your package management needs, whether
+ you're installing system packages, Flatpak applications, or portable
+ AppImages.|

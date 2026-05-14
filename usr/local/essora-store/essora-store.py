@@ -343,8 +343,8 @@ def _ensure_home_css():
     try:
         css = """
         .essora-home-banner {
-            background: rgba(255,255,255,0.02);
-            border: 1px solid rgba(255,255,255,0.08);
+            background: transparent;
+            border: none;
             border-radius: 18px;
             padding: 0;
         }
@@ -414,6 +414,62 @@ def _ensure_home_css():
         .fav-tile label {
             color: #ffffff;
             font-size: 9pt;
+        }
+        /* #agregado por josejp2424 -- pantalla principal: hero cards de los 3 formatos */
+        .hero-tagline {
+            color: #cdd0d6;
+            font-size: 13pt;
+            font-weight: 500;
+            padding: 6px 0 2px 0;
+        }
+        .hero-card {
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.10);
+            padding: 0;
+            transition: all 200ms ease-in-out;
+        }
+        .hero-card:hover {
+            border-color: rgba(255,255,255,0.28);
+        }
+        .hero-card-flatpak {
+            background: linear-gradient(135deg, #4A90D9 0%, #2C5AA0 100%);
+        }
+        .hero-card-flatpak:hover {
+            background: linear-gradient(135deg, #5BA0E5 0%, #3669B5 100%);
+        }
+        .hero-card-deb {
+            background: linear-gradient(135deg, #A80030 0%, #6E0020 100%);
+        }
+        .hero-card-deb:hover {
+            background: linear-gradient(135deg, #C00038 0%, #850028 100%);
+        }
+        .hero-card-appimage {
+            background: linear-gradient(135deg, #F6A623 0%, #B97500 100%);
+        }
+        .hero-card-appimage:hover {
+            background: linear-gradient(135deg, #FFB840 0%, #D08800 100%);
+        }
+        .hero-title {
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 16pt;
+            letter-spacing: 0.4px;
+        }
+        .hero-subtitle {
+            color: rgba(255,255,255,0.92);
+            font-size: 10pt;
+        }
+        .hero-explore-btn {
+            background: rgba(255,255,255,0.18);
+            color: #ffffff;
+            border: 1px solid rgba(255,255,255,0.35);
+            border-radius: 10px;
+            padding: 6px 14px;
+            font-weight: 600;
+        }
+        .hero-explore-btn:hover {
+            background: rgba(255,255,255,0.30);
+            border-color: rgba(255,255,255,0.55);
         }
         """
         provider = Gtk.CssProvider()
@@ -497,7 +553,7 @@ def _ensure_search_popover_css():
 
 
 from essora_core import CatalogManager, ActivityManager
-from ui_widgets import PackageRow
+from ui_widgets import PackageRow, PackageCard
 
 PAGE_SIZE = 250
 HOME_BANNER = "/usr/local/essora-store/banners/a_essora-store.svg"
@@ -518,6 +574,51 @@ ICON_MAP = {
 }
 
 WINDOW_ICON = "/usr/share/pixmaps/essora/essora.png"
+
+# #agregado por josejp2424 -- preferencia persistente de vista (list/grid)
+import configparser
+
+ESSORA_CONFIG_DIR = os.path.expanduser("~/.config/essora-store")
+ESSORA_CONFIG_FILE = os.path.join(ESSORA_CONFIG_DIR, "config.ini")
+DEFAULT_VIEW_MODE = "grid"
+
+def _load_view_mode() -> str:
+    """Lee la preferencia de vista desde ~/.config/essora-store/config.ini.
+    Devuelve 'grid' o 'list'. Si no hay config válida, devuelve el default."""
+    try:
+        if not os.path.exists(ESSORA_CONFIG_FILE):
+            return DEFAULT_VIEW_MODE
+        cp = configparser.ConfigParser()
+        cp.read(ESSORA_CONFIG_FILE, encoding="utf-8")
+        mode = cp.get("ui", "view_mode", fallback=DEFAULT_VIEW_MODE).strip().lower()
+        if mode not in ("grid", "list"):
+            return DEFAULT_VIEW_MODE
+        return mode
+    except Exception as e:
+        print(f"[CONFIG] No se pudo leer view_mode: {e}")
+        return DEFAULT_VIEW_MODE
+
+def _save_view_mode(mode: str) -> None:
+    """Persiste la preferencia de vista. Crea el directorio si no existe."""
+    try:
+        mode = (mode or "").strip().lower()
+        if mode not in ("grid", "list"):
+            return
+        os.makedirs(ESSORA_CONFIG_DIR, exist_ok=True)
+        cp = configparser.ConfigParser()
+        if os.path.exists(ESSORA_CONFIG_FILE):
+            try:
+                cp.read(ESSORA_CONFIG_FILE, encoding="utf-8")
+            except Exception:
+                cp = configparser.ConfigParser()
+        if not cp.has_section("ui"):
+            cp.add_section("ui")
+        cp.set("ui", "view_mode", mode)
+        with open(ESSORA_CONFIG_FILE, "w", encoding="utf-8") as f:
+            cp.write(f)
+    except Exception as e:
+        print(f"[CONFIG] No se pudo guardar view_mode: {e}")
+
 
 class BackendPage(Gtk.Box):
     def __init__(self, title: str, pkg_type: str, catalog: CatalogManager, activity: ActivityManager):
@@ -558,6 +659,27 @@ class BackendPage(Gtk.Box):
         self.backend_search_entry.set_size_request(-1, 40)
         self.backend_search_entry.connect("activate", self._on_backend_search_activate)
         search_bar.pack_start(self.backend_search_entry, True, True, 0)
+
+        # #editado por josejp2424 -- toggle Lista / Grilla con preferencia persistente
+        self._view_mode = _load_view_mode()  
+        view_toggle_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=0)
+        view_toggle_box.get_style_context().add_class("linked")
+
+        self.btn_view_list = Gtk.ToggleButton()
+        self.btn_view_list.set_tooltip_text(tr("List view"))
+        self.btn_view_list.set_image(Gtk.Image.new_from_icon_name("view-list-symbolic", Gtk.IconSize.BUTTON))
+        self.btn_view_list.set_active(self._view_mode == "list")
+        self.btn_view_list.connect("toggled", self._on_view_toggle, "list")
+        view_toggle_box.pack_start(self.btn_view_list, False, False, 0)
+
+        self.btn_view_grid = Gtk.ToggleButton()
+        self.btn_view_grid.set_tooltip_text(tr("Grid view"))
+        self.btn_view_grid.set_image(Gtk.Image.new_from_icon_name("view-grid-symbolic", Gtk.IconSize.BUTTON))
+        self.btn_view_grid.set_active(self._view_mode == "grid")
+        self.btn_view_grid.connect("toggled", self._on_view_toggle, "grid")
+        view_toggle_box.pack_start(self.btn_view_grid, False, False, 0)
+
+        search_bar.pack_end(view_toggle_box, False, False, 0)
         
         self.pack_start(search_bar, False, False, 0)
 
@@ -573,6 +695,26 @@ class BackendPage(Gtk.Box):
        
         self.notebook.connect("switch-page", self._on_switch_page)
         self._init_done = True
+
+        # #agregado por josejp2424 -- aplicar view_mode después de que GTK
+        # termine de procesar el layout inicial (sino el Stack arranca en 'list'
+        # aunque el ToggleButton 'grid' esté activado)
+        GLib.idle_add(self._apply_view_mode)
+
+    # #agregado por josejp2424 -- fuerza la vista actual en todos los Stacks
+    def _apply_view_mode(self):
+        try:
+            print(f"[VIEW] _apply_view_mode pkg={self.pkg_type} mode={self._view_mode}")
+            for tab_name, t in self.tabs.items():
+                st = t.get("stack")
+                if st is not None:
+                    before = st.get_visible_child_name()
+                    st.set_visible_child_name(self._view_mode)
+                    after = st.get_visible_child_name()
+                    print(f"[VIEW]   tab={tab_name} stack before={before} after={after}")
+        except Exception as e:
+            print(f"[VIEW] _apply_view_mode: {e}")
+        return False
 
     def _on_switch_page(self, notebook, page, page_num):
 
@@ -655,12 +797,36 @@ class BackendPage(Gtk.Box):
 
                 root.pack_start(multi_bar, False, False, 0)
 
+            # #editado por josejp2424 — vista dual: ListBox + FlowBox dentro de un Stack
             listbox = Gtk.ListBox()
             listbox.set_selection_mode(Gtk.SelectionMode.NONE)
-            scroll = Gtk.ScrolledWindow()
-            scroll.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
-            scroll.add(listbox)
-            root.pack_start(scroll, True, True, 0)
+            scroll_list = Gtk.ScrolledWindow()
+            scroll_list.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
+            scroll_list.add(listbox)
+
+            flowbox = Gtk.FlowBox()
+            flowbox.set_selection_mode(Gtk.SelectionMode.NONE)
+            flowbox.set_homogeneous(True)
+            flowbox.set_row_spacing(10)
+            flowbox.set_column_spacing(10)
+            flowbox.set_max_children_per_line(4)
+            flowbox.set_min_children_per_line(4)
+            flowbox.set_margin_top(6)
+            flowbox.set_margin_bottom(6)
+            flowbox.set_margin_start(6)
+            flowbox.set_margin_end(6)
+            scroll_grid = Gtk.ScrolledWindow()
+            scroll_grid.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
+            scroll_grid.add(flowbox)
+
+            stack = Gtk.Stack()
+            stack.set_transition_type(Gtk.StackTransitionType.CROSSFADE)
+            stack.set_transition_duration(150)
+            stack.add_named(scroll_list, "list")
+            stack.add_named(scroll_grid, "grid")
+            stack.set_visible_child_name(self._view_mode)
+            root.pack_start(stack, True, True, 0)
+
             btn_more = Gtk.Button(label=tr("Load {n} more", n=PAGE_SIZE))
             btn_more.get_style_context().add_class("backend-load-more")
             btn_more.connect("clicked", lambda *_: self.load_more(tab))
@@ -671,6 +837,8 @@ class BackendPage(Gtk.Box):
             return {
                 "root": root,
                 "list": listbox,
+                "grid": flowbox,
+                "stack": stack,
                 "more": btn_more,
                 "status": status,
                 # #agregado por josejp2424 — refs para la barra de selección múltiple
@@ -801,6 +969,11 @@ class BackendPage(Gtk.Box):
         lb = self.tabs[tab]["list"]
         for child in lb.get_children():
             lb.remove(child)
+        # #agregado por josejp2424 — limpiar también la grilla
+        gb = self.tabs[tab].get("grid")
+        if gb is not None:
+            for child in gb.get_children():
+                gb.remove(child)
 
     def load_more(self, tab):
         if tab == "All":
@@ -811,6 +984,7 @@ class BackendPage(Gtk.Box):
         off = self._offset.get(tab, 0)
         end = min(off + PAGE_SIZE, len(src))
         lb = self.tabs[tab]["list"]
+        gb = self.tabs[tab].get("grid")
         
         for app in src[off:end]:
             # #editado por josejp2424 — selección múltiple solo en DEB
@@ -821,11 +995,22 @@ class BackendPage(Gtk.Box):
                     selectable=True,
                     on_selection_changed=self._on_row_selection_changed,
                 )
+                card = PackageCard(
+                    app,
+                    self.activity,
+                    selectable=True,
+                    on_selection_changed=self._on_row_selection_changed,
+                )
             else:
                 row = PackageRow(app, self.activity)
+                card = PackageCard(app, self.activity)
             lb.add(row)
+            if gb is not None:
+                gb.add(card)
         
         lb.show_all()
+        if gb is not None:
+            gb.show_all()
         self._offset[tab] = end
         self.tabs[tab]["more"].set_visible(end < len(src))
         
@@ -834,6 +1019,37 @@ class BackendPage(Gtk.Box):
             extra = f"  |  {tr('Filter')}: {self._active_filter['label']}"
         
         self.tabs[tab]["status"].set_text(tr("Showing {end}/{total}{extra}", end=end, total=len(src), extra=extra))
+
+        # #agregado por josejp2424 -- reaplicar view_mode tras show_all
+        # (show_all puede mostrar todos los children del Stack a la vez)
+        GLib.idle_add(self._apply_view_mode)
+
+    # #agregado por josejp2424 — handler del toggle Lista/Grilla
+    def _on_view_toggle(self, button, mode):
+        if not button.get_active():
+            return
+        if mode == self._view_mode:
+            return
+        self._view_mode = mode
+
+        try:
+            if mode == "list":
+                self.btn_view_grid.handler_block_by_func(self._on_view_toggle)
+                self.btn_view_grid.set_active(False)
+                self.btn_view_grid.handler_unblock_by_func(self._on_view_toggle)
+            else:
+                self.btn_view_list.handler_block_by_func(self._on_view_toggle)
+                self.btn_view_list.set_active(False)
+                self.btn_view_list.handler_unblock_by_func(self._on_view_toggle)
+        except Exception:
+            pass
+
+        for t in self.tabs.values():
+            st = t.get("stack")
+            if st is not None:
+                st.set_visible_child_name(mode)
+        # #agregado por josejp2424 -- persistir la elección del usuario
+        _save_view_mode(mode)
 
     def refresh_after_activity(self):
         self.catalog.load_catalog()
@@ -849,11 +1065,17 @@ class BackendPage(Gtk.Box):
         tab = self.tabs.get("All")
         if not tab:
             return
-        lb = tab.get("list")
-        if not lb:
+
+        if self._view_mode == "grid" and tab.get("grid") is not None:
+            container = tab.get("grid")
+            cls = PackageCard
+        else:
+            container = tab.get("list")
+            cls = PackageRow
+        if not container:
             return
-        for child in lb.get_children():
-            if isinstance(child, PackageRow) and child.check_select is not None:
+        for child in container.get_children():
+            if isinstance(child, cls) and child.check_select is not None:
                 yield child
 
     def _on_row_selection_changed(self, _row):
@@ -1434,103 +1656,130 @@ class HomePage(Gtk.Box):
         self.pack_start(banner_frame, False, False, 0)
         self.banner_overlay.connect("size-allocate", self._on_banner_allocate)
 
-        search_wrap = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
-        search_wrap.set_halign(Gtk.Align.CENTER)
-        search_wrap.get_style_context().add_class("essora-search-wrap")
+        # #editado por josejp2424 -- buscador retirado de la pantalla principal.
+        # Cada pestaña (Flatpak/DEB/AppImage) ya tiene su propio buscador.
+        # Los objetos search_entry/search_button quedan creados pero sin packear,
+        # para preservar compatibilidad con código externo que los referencia
+        # (EssoraStoreWindow conecta señales en ellos).
         self.search_entry = Gtk.SearchEntry()
         self.search_entry.set_placeholder_text(tr("Search apps (DEB / Flatpak / AppImage)…"))
-        self.search_entry.set_width_chars(44)
-        self.search_entry.set_size_request(460, 42)
-        search_wrap.pack_start(self.search_entry, False, False, 0)
-
         self.search_button = Gtk.Button.new_from_icon_name("system-search", Gtk.IconSize.BUTTON)
-        self.search_button.get_style_context().add_class("essora-search-btn")
         self.search_button.set_tooltip_text(tr("Search"))
-        self.search_button.set_size_request(46, 42)
-        search_wrap.pack_start(self.search_button, False, False, 0)
-        self.pack_start(search_wrap, False, False, 0)
 
-        categories_grid = Gtk.Grid()
-        categories_grid.set_column_spacing(12)
-        categories_grid.set_row_spacing(12)
-        categories_grid.set_column_homogeneous(True)
-        categories_grid.set_row_homogeneous(True)
-        self.pack_start(categories_grid, False, False, 0)
+        # #editado por josejp2424 -- nueva pantalla principal:
+        # se reemplazan las tiles de categorías y la grilla de apps destacadas
+        # por una frase animada (typewriter) y 3 hero cards de los formatos.
 
-        categories = [
-            ("Universal Access", ["access", "accessibility", "a11y", "acces"], "flatpak"),
-            ("Accessories", ["accessory", "accessories", "plugin", "addon", "tool"], "deb"),
-            ("Audio", ["audio", "music", "musi", "sound"], "flatpak"),
-            ("Communication", ["chat", "mess", "mail", "email", "telegram", "discord", "comunic"], "flatpak"),
-            ("Development", ["dev", "develop", "program", "code", "ide", "desarroll"], "deb"),
-            ("Education", ["edu", "learn", "course", "educ"], "deb"),
-            ("Writing and Languages", ["office", "writer", "document", "lang", "idioma", "escrit"], "deb"),
-            ("Finance", ["finance", "finanz", "money", "bank", "wallet"], "deb"),
+        # Frase typewriter centrada
+        self.tagline_label = Gtk.Label()
+        self.tagline_label.set_use_markup(True)
+        self.tagline_label.set_halign(Gtk.Align.CENTER)
+        self.tagline_label.set_justify(Gtk.Justification.CENTER)
+        self.tagline_label.get_style_context().add_class("hero-tagline")
+        self.tagline_label.set_margin_top(20)
+        self.tagline_label.set_margin_bottom(8)
+        self.tagline_label.set_markup("<span> </span>")
+        self.pack_start(self.tagline_label, False, False, 0)
+
+
+        hero_row = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=14)
+        hero_row.set_homogeneous(True)
+        hero_row.set_margin_top(10)
+        hero_row.set_margin_bottom(8)
+        self.pack_start(hero_row, True, True, 0)
+
+        hero_specs = [
+            ("flatpak", "Flatpak", tr("Sandboxed apps from Flathub"),
+             "package-x-generic-symbolic", "hero-card-flatpak"),
+            ("deb", "DEB", tr("Native Debian packages"),
+             "package-x-generic-symbolic", "hero-card-deb"),
+            ("appimage", "AppImage", tr("Portable, no installation"),
+             "application-x-executable-symbolic", "hero-card-appimage"),
         ]
 
-        for idx, (label, pats, default_backend) in enumerate(categories):
-            btn = Gtk.Button()
-            btn.set_hexpand(True)
-            btn.set_vexpand(True)
-            btn.set_size_request(0, 58)
-            btn.set_relief(Gtk.ReliefStyle.NONE)
-            btn.get_style_context().add_class("essora-tile")
-            btn.get_style_context().add_class(CATEGORY_TILE_CLASS.get(label, ""))
+        self._hero_cards = []
+        for backend, title, subtitle, icon_name, color_cls in hero_specs:
+            card = Gtk.Button()
+            card.set_relief(Gtk.ReliefStyle.NONE)
+            card.set_hexpand(True)
+            card.set_vexpand(True)
+            card.set_size_request(0, 200)
+            card.get_style_context().add_class("hero-card")
+            card.get_style_context().add_class(color_cls)
+            card.set_tooltip_text(tr("Open {name}", name=title))
 
-            box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
-            box.set_halign(Gtk.Align.START)
-            box.set_valign(Gtk.Align.CENTER)
-            box.set_margin_start(14)
-            box.set_margin_end(14)
-            box.set_margin_top(8)
-            box.set_margin_bottom(8)
+            inner = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+            inner.set_halign(Gtk.Align.CENTER)
+            inner.set_valign(Gtk.Align.CENTER)
+            inner.set_margin_top(18)
+            inner.set_margin_bottom(18)
+            inner.set_margin_start(16)
+            inner.set_margin_end(16)
 
-            icon_name = CATEGORY_ICON_SYMBOLIC.get(label, "applications-other-symbolic")
-            img = Gtk.Image.new_from_icon_name(icon_name, Gtk.IconSize.MENU)
-            img.set_pixel_size(14)
+            # Icono grande
+            img = Gtk.Image.new_from_icon_name(icon_name, Gtk.IconSize.DIALOG)
+            try:
+                img.set_pixel_size(56)
+            except Exception:
+                pass
+            img.set_halign(Gtk.Align.CENTER)
+            inner.pack_start(img, False, False, 0)
 
-            lab = Gtk.Label(label=tr(label).upper(), xalign=0)
-            lab.set_line_wrap(False)
-            lab.set_ellipsize(Pango.EllipsizeMode.END)
-            font_desc = Pango.font_description_from_string("9")
-            lab.override_font(font_desc)
+            # Título
+            t = Gtk.Label()
+            t.set_markup(f"<span weight='bold'>{GLib.markup_escape_text(title)}</span>")
+            t.get_style_context().add_class("hero-title")
+            t.set_halign(Gtk.Align.CENTER)
+            inner.pack_start(t, False, False, 0)
 
-            box.pack_start(img, False, False, 0)
-            box.pack_start(lab, True, True, 0)
-            btn.add(box)
-            btn.connect("clicked", lambda _b, l=label, p=pats, bk=default_backend: self.on_open_category(l, p, bk))
-            categories_grid.attach(btn, idx % 4, idx // 4, 1, 1)
+            # Subtítulo
+            s = Gtk.Label(label=subtitle)
+            s.get_style_context().add_class("hero-subtitle")
+            s.set_halign(Gtk.Align.CENTER)
+            s.set_justify(Gtk.Justification.CENTER)
+            s.set_line_wrap(True)
+            s.set_max_width_chars(28)
+            inner.pack_start(s, False, False, 0)
 
-        self.flatpak_scroll = Gtk.ScrolledWindow()
-        self.flatpak_scroll.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
-        self.flatpak_scroll.set_shadow_type(Gtk.ShadowType.NONE)
-        self.flatpak_scroll.set_size_request(-1, 520)
+            # Pseudo-botón "Explorar" (visual; el click es sobre la card entera)
+            explore = Gtk.Label(label=tr("Explore"))
+            explore.get_style_context().add_class("hero-explore-btn")
+            explore.set_halign(Gtk.Align.CENTER)
+            explore_wrap = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+            explore_wrap.set_halign(Gtk.Align.CENTER)
+            explore_wrap.set_margin_top(4)
+            explore_wrap.pack_start(explore, False, False, 0)
+            inner.pack_start(explore_wrap, False, False, 0)
 
+            card.add(inner)
+            card.connect("clicked", lambda _b, bk=backend: self.on_open_category(None, None, bk))
+            hero_row.pack_start(card, True, True, 0)
+            self._hero_cards.append(card)
+
+        
+        
         self.flatpak_flow = Gtk.FlowBox()
-        self.flatpak_flow.set_selection_mode(Gtk.SelectionMode.NONE)
-        self.flatpak_flow.set_homogeneous(True)
-        self.flatpak_flow.set_row_spacing(10)
-        self.flatpak_flow.set_column_spacing(10)
-        self.flatpak_flow.set_max_children_per_line(4)
-        self.flatpak_flow.set_min_children_per_line(4)
-
-        self.flatpak_scroll.add(self.flatpak_flow)
-        self.pack_start(self.flatpak_scroll, False, False, 0)
-
+        self.flatpak_flow.set_no_show_all(True)
         self.fav_flow = Gtk.FlowBox()
-        self.fav_flow.set_selection_mode(Gtk.SelectionMode.NONE)
-        self.fav_flow.set_homogeneous(True)
-        self.fav_flow.set_row_spacing(8)
-        self.fav_flow.set_column_spacing(8)
-        self.fav_flow.set_max_children_per_line(8)
-        self.fav_flow.set_min_children_per_line(4)
-        self.pack_start(self.fav_flow, False, False, 0)
+        self.fav_flow.set_no_show_all(True)
 
-        GLib.idle_add(self._load_flatpak_apps)
-        GLib.idle_add(self._load_favorites)
+        # Estado typewriter
+        self._tw_phrases = [
+            tr("Essora Store manages Flatpak…"),
+            tr("…native DEB packages…"),
+            tr("…and portable AppImages."),
+            tr("All your software, one place."),
+        ]
+        self._tw_phrase_idx = 0
+        self._tw_char_idx = 0
+        self._tw_mode = "typing"  
+        self._tw_hold_ticks = 0
+
         GLib.idle_add(self._build_dots)
         GLib.idle_add(self._render_current_banner)
         GLib.timeout_add_seconds(7, self._next_banner)
+        # #agregado por josejp2424 -- arrancar typewriter
+        GLib.timeout_add(60, self._tick_typewriter)
 
     def _load_flatpak_apps(self):
         flatpak_txt = "/usr/local/essora-store/flatpak.txt"
@@ -1804,19 +2053,34 @@ class HomePage(Gtk.Box):
             self._update_dots()
             return False
         try:
+            # #editado por josejp2424 -- banner llena el ancho con tope de altura
+            # para que no tape las hero cards en pantallas anchas.
             w = self._last_banner_width or 860
-            h = 230
-            
+            MAX_H = 250
 
             if path.lower().endswith('.svg'):
-                pix = GdkPixbuf.Pixbuf.new_from_file_at_size(path, w, h)
+                base = GdkPixbuf.Pixbuf.new_from_file(path)
+                bw, bh = max(1, base.get_width()), max(1, base.get_height())
+                aspect = bh / bw
+                h = max(1, int(w * aspect))
+                if h > MAX_H:
+                    h = MAX_H
+                    w_adj = int(h / aspect)
+                else:
+                    w_adj = w
+                pix = GdkPixbuf.Pixbuf.new_from_file_at_size(path, w_adj, h)
                 self.banner.set_from_pixbuf(pix)
             else:
-  
                 pix = GdkPixbuf.Pixbuf.new_from_file(path)
-                h = max(1, int(w * (pix.get_height() / max(1, pix.get_width()))))
-                h = min(h, 230)
-                scaled = pix.scale_simple(w, h, GdkPixbuf.InterpType.BILINEAR)
+                bw, bh = max(1, pix.get_width()), max(1, pix.get_height())
+                aspect = bh / bw
+                h = max(1, int(w * aspect))
+                if h > MAX_H:
+                    h = MAX_H
+                    w_adj = int(h / aspect)
+                else:
+                    w_adj = w
+                scaled = pix.scale_simple(w_adj, h, GdkPixbuf.InterpType.BILINEAR)
                 self.banner.set_from_pixbuf(scaled)
         except Exception as e:
             print(f"[BANNER] Error: {e}")
@@ -1829,6 +2093,41 @@ class HomePage(Gtk.Box):
             return True
         self.banner_index = (self.banner_index + 1) % len(self.banner_paths)
         self._render_current_banner()
+        return True
+
+    # #agregado por josejp2424 -- typewriter animado para la frase principal
+    def _tick_typewriter(self):
+        try:
+            if not getattr(self, "tagline_label", None):
+                return False
+            if not self._tw_phrases:
+                return False
+            phrase = self._tw_phrases[self._tw_phrase_idx]
+
+            if self._tw_mode == "typing":
+                self._tw_char_idx += 1
+                if self._tw_char_idx >= len(phrase):
+                    self._tw_char_idx = len(phrase)
+                    self._tw_mode = "holding"
+                    self._tw_hold_ticks = 0
+            elif self._tw_mode == "holding":
+                self._tw_hold_ticks += 1
+                if self._tw_hold_ticks >= 30:
+                    self._tw_mode = "erasing"
+            elif self._tw_mode == "erasing":
+                self._tw_char_idx -= 1
+                if self._tw_char_idx <= 0:
+                    self._tw_char_idx = 0
+                    self._tw_mode = "typing"
+                    self._tw_phrase_idx = (self._tw_phrase_idx + 1) % len(self._tw_phrases)
+
+            shown = phrase[: self._tw_char_idx]
+            cursor = "▎" if (self._tw_hold_ticks // 5) % 2 == 0 else " "
+            safe = GLib.markup_escape_text(shown)
+            self.tagline_label.set_markup(f"<span>{safe}</span><span foreground='#99AE47'>{cursor}</span>")
+        except Exception as e:
+            print(f"[TYPEWRITER] {e}")
+            return False
         return True
 
 

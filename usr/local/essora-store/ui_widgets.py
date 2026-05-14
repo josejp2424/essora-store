@@ -27,6 +27,11 @@ INSTALLED_BADGE_FALLBACK_PATH = "/usr/local/essora-store/icons/install.png"
 INSTALLED_BADGE_MAX_WIDTH = 92
 INSTALLED_BADGE_MAX_HEIGHT = 46
 
+# #agregado por josejp2424 — badge para apps sin URL instalable
+NOT_AVAILABLE_BADGE_PATH = "/usr/local/essora-store/icons/not_available.png"
+NOT_AVAILABLE_BADGE_MAX_WIDTH = 92
+NOT_AVAILABLE_BADGE_MAX_HEIGHT = 46
+
 def _ensure_css():
     css = b"""
     .pkg-card {
@@ -47,6 +52,19 @@ def _ensure_css():
         min-width: 42px;
         min-height: 34px;
         padding: 0;
+    }
+    /* #agregado por josejp2424 -- tarjetas verticales para vista en grilla */
+    .pkg-grid-card {
+        border: 1px solid rgba(255,255,255,0.10);
+        border-radius: 12px;
+        background: rgba(255,255,255,0.03);
+        padding: 14px;
+        min-width: 180px;
+        min-height: 200px;
+    }
+    .pkg-grid-card:hover {
+        background: rgba(255,255,255,0.06);
+        border-color: rgba(255,255,255,0.18);
     }
     """
     provider = Gtk.CssProvider()
@@ -69,6 +87,21 @@ def _pixbuf_from_file(path: str, width: int, height: int = None):
     except Exception:
         return None
     return None
+
+
+# #agregado por josejp2424 — detecta si una AppImage tiene URL instalable.
+# Solo aplica a pkg_type == "appimage"; deb/flatpak siempre son instalables.
+def _appimage_is_installable(app) -> bool:
+    pkg_type = (getattr(app, "pkg_type", "") or "").strip().lower()
+    if pkg_type != "appimage":
+        return True
+    url = (getattr(app, "download_url", "") or "").strip()
+    if url and url.lower().split("?")[0].split("#")[0].endswith(".appimage"):
+        return True
+    gh = (getattr(app, "github_path", "") or "").strip()
+    if gh and "/" in gh:
+        return True
+    return False
 
 class PackageRow(Gtk.ListBoxRow):
     """Fila visual de paquete con:
@@ -200,6 +233,26 @@ class PackageRow(Gtk.ListBoxRow):
                 pass
         meta.pack_end(self.badge_installed, False, False, 0)
 
+        # #agregado por josejp2424 — badge para AppImages sin URL instalable
+        self.badge_not_available = Gtk.Image()
+        self.badge_not_available.set_no_show_all(True)
+        self.badge_not_available.set_tooltip_text(tr("Not available"))
+        na_pix = _pixbuf_from_file(
+            NOT_AVAILABLE_BADGE_PATH,
+            NOT_AVAILABLE_BADGE_MAX_WIDTH,
+            NOT_AVAILABLE_BADGE_MAX_HEIGHT,
+        )
+        if na_pix:
+            self.badge_not_available.set_from_pixbuf(na_pix)
+        else:
+            # Fallback a un icono del tema si no existe la imagen
+            self.badge_not_available.set_from_icon_name("dialog-warning-symbolic", Gtk.IconSize.BUTTON)
+            try:
+                self.badge_not_available.set_pixel_size(18)
+            except Exception:
+                pass
+        meta.pack_end(self.badge_not_available, False, False, 0)
+
         right = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=6)
         right.set_size_request(104, -1)
         right.set_halign(Gtk.Align.END)
@@ -296,6 +349,8 @@ class PackageRow(Gtk.ListBoxRow):
 
     def refresh(self):
         installed = bool(getattr(self.app, "installed", False))
+        # #agregado por josejp2424 — detectar AppImages sin URL instalable
+        installable = _appimage_is_installable(self.app)
 
         if installed:
 
@@ -303,16 +358,25 @@ class PackageRow(Gtk.ListBoxRow):
             self.btn_reinstall.show()
             self.btn_uninstall.show()
             self.badge_installed.show()
+            self.badge_not_available.hide()
+        elif not installable:
+            self.btn_install.hide()
+            self.btn_reinstall.hide()
+            self.btn_uninstall.hide()
+            self.badge_installed.hide()
+            self.badge_not_available.show()
         else:
 
             self.btn_install.show()
             self.btn_reinstall.hide()
             self.btn_uninstall.hide()
             self.badge_installed.hide()
+            self.badge_not_available.hide()
 
         # #agregado por josejp2424 — el check solo tiene sentido si NO está instalado
+        # y si la app es instalable (tiene sentido agrupar para batch install).
         if self.check_select is not None:
-            if installed:
+            if installed or not installable:
                 self.check_select.set_active(False)
                 self.check_select.hide()
             else:
@@ -455,3 +519,297 @@ class UpdateRow(Gtk.ListBoxRow):
   
             if hasattr(self.activity, "update_all"):
                 self.activity.update_all(self.pkg_type)
+
+
+# #agregado por josejp2424 — tarjeta vertical para vista en grilla (FlowBox)
+class PackageCard(Gtk.FlowBoxChild):
+    """Tarjeta vertical de paquete (vista en grilla).
+    Replica la lógica de PackageRow pero con disposición vertical:
+      - Icono grande arriba (centrado)
+      - Nombre y descripción (centrados)
+      - Versión
+      - Botones de acción al pie
+    """
+    def __init__(self, app, activity, selectable=False, on_selection_changed=None):
+        super().__init__()
+        global _css_loaded
+        if not _css_loaded:
+            _ensure_css()
+            _css_loaded = True
+
+        self.app = app
+        self.activity = activity
+        self.selectable = bool(selectable)
+        self._on_selection_changed = on_selection_changed
+        self.check_select = None
+
+        self.set_margin_top(4)
+        self.set_margin_bottom(4)
+        self.set_margin_start(4)
+        self.set_margin_end(4)
+
+        frame = Gtk.Frame()
+        frame.set_shadow_type(Gtk.ShadowType.NONE)
+        frame.get_style_context().add_class("pkg-grid-card")
+        self.add(frame)
+
+        outer = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
+        frame.add(outer)
+
+        top_row = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=6)
+        outer.pack_start(top_row, False, False, 0)
+
+        if self.selectable:
+            self.check_select = Gtk.CheckButton()
+            self.check_select.set_tooltip_text(tr("Select for batch install"))
+            try:
+                self.check_select.set_can_focus(False)
+            except Exception:
+                pass
+            self.check_select.connect("toggled", self._on_check_toggled)
+            top_row.pack_start(self.check_select, False, False, 0)
+
+        top_spacer = Gtk.Box()
+        top_row.pack_start(top_spacer, True, True, 0)
+
+        self.badge_installed = Gtk.Image()
+        self.badge_installed.set_no_show_all(True)
+        self.badge_installed.set_tooltip_text(tr("Installed"))
+        badge_pix = _pixbuf_from_file(INSTALLED_BADGE_PATH, INSTALLED_BADGE_MAX_WIDTH, INSTALLED_BADGE_MAX_HEIGHT)
+        if not badge_pix:
+            badge_pix = _pixbuf_from_file(INSTALLED_BADGE_FALLBACK_PATH, 18, 18)
+        if badge_pix:
+            self.badge_installed.set_from_pixbuf(badge_pix)
+        else:
+            self.badge_installed.set_from_icon_name("emblem-ok-symbolic", Gtk.IconSize.BUTTON)
+            try:
+                self.badge_installed.set_pixel_size(18)
+            except Exception:
+                pass
+        top_row.pack_end(self.badge_installed, False, False, 0)
+
+        self.badge_not_available = Gtk.Image()
+        self.badge_not_available.set_no_show_all(True)
+        self.badge_not_available.set_tooltip_text(tr("Not available"))
+        na_pix = _pixbuf_from_file(
+            NOT_AVAILABLE_BADGE_PATH,
+            NOT_AVAILABLE_BADGE_MAX_WIDTH,
+            NOT_AVAILABLE_BADGE_MAX_HEIGHT,
+        )
+        if na_pix:
+            self.badge_not_available.set_from_pixbuf(na_pix)
+        else:
+            self.badge_not_available.set_from_icon_name("dialog-warning-symbolic", Gtk.IconSize.BUTTON)
+            try:
+                self.badge_not_available.set_pixel_size(18)
+            except Exception:
+                pass
+        top_row.pack_end(self.badge_not_available, False, False, 0)
+
+        # Icono grande centrado
+        img = Gtk.Image()
+        img.set_halign(Gtk.Align.CENTER)
+        pix = _pixbuf_from_file(getattr(app, "icon_path", ""), 64)
+        if pix:
+            img.set_from_pixbuf(pix)
+        else:
+            img.set_from_icon_name("application-x-executable", Gtk.IconSize.DIALOG)
+            img.set_pixel_size(64)
+        outer.pack_start(img, False, False, 0)
+
+        # Nombre centrado
+        title = Gtk.Label()
+        title.set_use_markup(True)
+        title.set_xalign(0.5)
+        title.set_justify(Gtk.Justification.CENTER)
+        title.set_line_wrap(False)
+        title.set_ellipsize(Pango.EllipsizeMode.END)
+        title.set_max_width_chars(22)
+        safe = GLib.markup_escape_text(getattr(app, "name", "") or getattr(app, "app_id", ""))
+        title.set_markup(f"<b>{safe}</b>")
+        outer.pack_start(title, False, False, 0)
+
+        # Versión
+        installed_ver = getattr(app, "installed_version", "") or ""
+        available_ver = getattr(app, "available_version", "") or ""
+        self.version_label = Gtk.Label()
+        self.version_label.set_use_markup(True)
+        self.version_label.set_xalign(0.5)
+        self.version_label.set_justify(Gtk.Justification.CENTER)
+        self.version_label.set_line_wrap(False)
+        self.version_label.set_ellipsize(Pango.EllipsizeMode.END)
+        self.version_label.get_style_context().add_class("dim-label")
+        if installed_ver or available_ver:
+            if installed_ver and available_ver and installed_ver != available_ver:
+                version_text = f"<span size='small' color='#FFA500'>{tr('Version')}: {GLib.markup_escape_text(installed_ver)} → {GLib.markup_escape_text(available_ver)}</span>"
+            elif installed_ver:
+                version_text = f"<span size='small'>{tr('Version')}: {GLib.markup_escape_text(installed_ver)}</span>"
+            elif available_ver:
+                version_text = f"<span size='small'>{tr('Version')}: {GLib.markup_escape_text(available_ver)}</span>"
+            else:
+                version_text = ""
+            if version_text:
+                self.version_label.set_markup(version_text)
+        outer.pack_start(self.version_label, False, False, 0)
+
+        # Descripción (1 línea, elipsis)
+        desc = Gtk.Label()
+        desc.set_use_markup(True)
+        desc.set_xalign(0.5)
+        desc.set_justify(Gtk.Justification.CENTER)
+        desc.set_line_wrap(False)
+        desc.set_ellipsize(Pango.EllipsizeMode.END)
+        desc.set_max_width_chars(28)
+        s = (getattr(app, "summary", "") or "").strip()
+        if len(s) > 80:
+            s = s[:77] + "…"
+        desc.set_markup(f"<span size='small'>{GLib.markup_escape_text(s)}</span>")
+        desc.get_style_context().add_class("dim-label")
+        outer.pack_start(desc, True, True, 0)
+
+        # Botones de acción al pie
+        self.action_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=6)
+        self.action_box.set_halign(Gtk.Align.CENTER)
+        outer.pack_end(self.action_box, False, False, 0)
+
+        install_icons = [
+            "package-x-generic-symbolic",
+            "package-x-generic",
+            "system-software-install-symbolic",
+            "system-software-install",
+            "application-x-deb",
+        ]
+        self.btn_install = self._mk_icon_btn(install_icons, tr("Install"))
+        self.btn_install.connect("clicked", self._on_install)
+
+        self.btn_reinstall = self._mk_icon_btn(["view-refresh-symbolic", "view-refresh"], tr("Reinstall"))
+        self.btn_reinstall.connect("clicked", self._on_reinstall)
+
+        self.btn_uninstall = self._mk_icon_btn(["user-trash-symbolic", "user-trash"], tr("Uninstall"))
+        self.btn_uninstall.get_style_context().add_class("destructive-action")
+        self.btn_uninstall.connect("clicked", self._on_uninstall)
+
+        for w in (self.btn_install, self.btn_reinstall, self.btn_uninstall):
+            w.set_no_show_all(True)
+            w.get_style_context().add_class("pkg-action-btn")
+
+        self.action_box.pack_start(self.btn_install, False, False, 0)
+        self.action_box.pack_start(self.btn_reinstall, False, False, 0)
+        self.action_box.pack_start(self.btn_uninstall, False, False, 0)
+
+        self.refresh()
+
+    def _pick_icon_name(self, icon_names):
+        if isinstance(icon_names, (list, tuple)):
+            names = list(icon_names)
+        else:
+            names = [str(icon_names)]
+        try:
+            theme = Gtk.IconTheme.get_default()
+        except Exception:
+            theme = None
+        for n in names:
+            if not n:
+                continue
+            if theme is None:
+                return n
+            try:
+                if theme.has_icon(n):
+                    return n
+            except Exception:
+                return n
+        return None
+
+    def _mk_icon_btn(self, icon_names, tooltip: str) -> Gtk.Button:
+        btn = Gtk.Button()
+        btn.set_relief(Gtk.ReliefStyle.NONE)
+        btn.set_tooltip_text(tooltip)
+        btn.set_size_request(42, 34)
+        btn.get_style_context().add_class("pkg-action-btn")
+        try:
+            btn.set_focus_on_click(False)
+        except Exception:
+            pass
+        try:
+            btn.set_can_focus(False)
+        except Exception:
+            pass
+
+        icon = self._pick_icon_name(icon_names)
+        if icon:
+            image = Gtk.Image.new_from_icon_name(icon, Gtk.IconSize.BUTTON)
+            try:
+                image.set_pixel_size(18)
+            except Exception:
+                pass
+            btn.set_image(image)
+            btn.set_always_show_image(True)
+        else:
+            btn.set_label(tooltip)
+        return btn
+
+    def _set_busy(self, busy: bool = True):
+        for b in (self.btn_install, self.btn_reinstall, self.btn_uninstall):
+            try:
+                b.set_sensitive(not busy)
+            except Exception:
+                pass
+
+    def refresh(self):
+        installed = bool(getattr(self.app, "installed", False))
+        installable = _appimage_is_installable(self.app)
+
+        if installed:
+            self.btn_install.hide()
+            self.btn_reinstall.show()
+            self.btn_uninstall.show()
+            self.badge_installed.show()
+            self.badge_not_available.hide()
+        elif not installable:
+            self.btn_install.hide()
+            self.btn_reinstall.hide()
+            self.btn_uninstall.hide()
+            self.badge_installed.hide()
+            self.badge_not_available.show()
+        else:
+            self.btn_install.show()
+            self.btn_reinstall.hide()
+            self.btn_uninstall.hide()
+            self.badge_installed.hide()
+            self.badge_not_available.hide()
+
+        if self.check_select is not None:
+            if installed or not installable:
+                self.check_select.set_active(False)
+                self.check_select.hide()
+            else:
+                self.check_select.show()
+
+    def _on_check_toggled(self, _btn):
+        if callable(self._on_selection_changed):
+            try:
+                self._on_selection_changed(self)
+            except Exception:
+                pass
+
+    def is_selected(self) -> bool:
+        return bool(self.check_select and self.check_select.get_active())
+
+    def set_selected(self, value: bool):
+        if self.check_select is not None:
+            self.check_select.set_active(bool(value))
+
+    def _on_install(self, *_):
+        self._set_busy(True)
+        self.activity.install(self.app)
+
+    def _on_uninstall(self, *_):
+        self._set_busy(True)
+        self.activity.uninstall(self.app)
+
+    def _on_reinstall(self, *_):
+        self._set_busy(True)
+        if hasattr(self.activity, "reinstall"):
+            self.activity.reinstall(self.app)
+        else:
+            self.activity.install(self.app)

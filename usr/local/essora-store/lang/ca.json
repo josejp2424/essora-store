@@ -10,7 +10,7 @@
   "Fix Broken Packages": "Reparar paquets trencats",
   "Refresh Catalog": "Actualitza el catàleg",
   "Available": "Disponibles",
-  "All": "Tot",  
+  "All": "Tot",
   "Installed": "Instal·lats",
   "Update": "Actualitza",
   "Repos": "Repositoris",
@@ -116,5 +116,16 @@
   "• AppImage integration": "• Integració amb AppImage",
   "• Unified interface for all package types": "• Interfície unificada per a tots els tipus de paquets",
   "• Easy to use and intuitive": "• Fàcil d'usar i intuïtiu",
-  "© 2025 josejp2424. All rights reserved.": "© 2025 josejp2424. Tots els drets reservats."
+  "© 2025 josejp2424. All rights reserved.": "© 2025 josejp2424. Tots els drets reservats.",
+  "List view": "Vista de llista",
+  "Grid view": "Vista de quadrícula",
+  "Sandboxed apps from Flathub": "Aplicacions sandbox de Flathub",
+  "Native Debian packages": "Paquets natius de Debian",
+  "Portable, no installation": "Portables, sense instal·lació",
+  "Open {name}": "Obre {name}",
+  "Explore": "Explora",
+  "Essora Store manages Flatpak…": "Essora Store gestiona Flatpak…",
+  "…native DEB packages…": "…paquets DEB natius…",
+  "…and portable AppImages.": "…i AppImages portables.",
+  "All your software, one place.": "Tot el teu programari, en un sol lloc."
 }

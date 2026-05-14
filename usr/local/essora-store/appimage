@@ -16,6 +16,8 @@ ICON_CACHE_DIR="/usr/local/essora-store/icons/appimage"
 FALLBACK_ICON="/usr/local/essora-store/icons/app_appimage.png"
 FEED_URL="https://appimage.github.io/feed.json"
 GITHUB_API="https://api.github.com/repos"
+# #agregado por josejp2424 — URL base para bajar data/<AppName> con URL directa del binario
+DATA_RAW_URL="https://raw.githubusercontent.com/AppImage/appimage.github.io/master/data"
 
 APPIMAGE_DIR_USER="${HOME}/Applications"
 APPIMAGE_ROOT_SYSTEM="/opt/appimage"
@@ -65,29 +67,20 @@ get_icon() {
 }
 
 get_download_url() {
-  local github_path="$1"   
-  local direct_url="$2"   
-  
+  # #editado por josejp2424 — NO consultar GitHub API aquí.
+  # Con 1,300+ apps, el rate limit de 60 req/h deja la mayoría sin resolver
+  # y guardar la página HTML como fallback hacía que wget bajara HTML.
+  # Ahora: guardamos direct_url si el feed la provee, si no string vacío.
+  # El Store resolverá la URL lazy al instalar cada app (1 request a la vez).
+  local github_path="$1"
+  local direct_url="$2"
+
   if [[ -n "$direct_url" ]]; then
     echo "$direct_url"
     return
   fi
 
-  [[ -z "$github_path" ]] && echo "" && return
-
-
-  local api_url="${GITHUB_API}/${github_path}/releases/latest"
-  local rel_json
-  if command -v curl >/dev/null 2>&1; then
-    rel_json=$(curl -fsSL --max-time 10 "$api_url" 2>/dev/null || echo "")
-  else
-    rel_json=$(wget -q --timeout=10 -O- "$api_url" 2>/dev/null || echo "")
-  fi
-
-  local dl_url
-  dl_url=$(echo "$rel_json" | grep -o '"browser_download_url":"[^"]*\.AppImage"' | head -n1 | cut -d'"' -f4 || true)
-
-  echo "$dl_url"
+  echo ""
 }
 
 find_installed_path() {
@@ -138,6 +131,14 @@ total=0
 installed_count=0
 upd_count=0
 
+# #agregado por josejp2424 — segundo pass: apps sin github ni URL directa
+# Acumulamos el `name` original de esas apps para después bajar data/<Name>
+# desde el repo AppImage/appimage.github.io (sin pasar por la API).
+ORPHANS_LIST="/tmp/appimage_orphans_$$.txt"
+ORPHANS_RESOLVED="/tmp/appimage_resolved_$$.txt"
+trap 'rm -f "$FEED_CACHE" "$ORPHANS_LIST" "$ORPHANS_RESOLVED"' EXIT
+: > "$ORPHANS_LIST"
+
 
 while IFS= read -r item; do
   name=$(echo "$item" | jq -r '.name // ""')
@@ -158,7 +159,24 @@ while IFS= read -r item; do
 
   download_url=$(get_download_url "$github_path" "$direct_dl")
 
-  [[ -z "$download_url" && -n "$github_path" ]] && download_url="https://github.com/${github_path}/releases/latest"
+  # #editado por josejp2424 — RESOLUCION EN BATCH AL GENERAR.
+  # Si la URL no es directa al .appimage, encolamos para el segundo pass.
+  # El segundo pass intentara: data/<name> -> GitHub API -> HTML scrape.
+  # Formato: "name|app_id|github_path" (github_path puede ser vacio)
+  is_direct_appimage=0
+  if [[ -n "$download_url" ]]; then
+    lower_url=$(echo "$download_url" | tr '[:upper:]' '[:lower:]')
+    clean_url="${lower_url%%\?*}"
+    clean_url="${clean_url%%#*}"
+    if [[ "$clean_url" == *.appimage ]]; then
+      is_direct_appimage=1
+    fi
+  fi
+
+  if [[ $is_direct_appimage -eq 0 ]]; then
+    download_url=""
+    echo "${name}|${app_id}|${github_path}" >> "$ORPHANS_LIST"
+  fi
 
   inst_path=$(find_installed_path "$app_id")
   installed=false
@@ -211,9 +229,161 @@ done < <(jq -c '.items[]' "$FEED_CACHE")
 
 echo "]" >> "$JSON_FILE"
 
+# #agregado por josejp2424 — SEGUNDO PASS: rescatar apps huérfanas desde data/<Name>
+# El feed.json de AppImageHub no trae URL ni github path para todas las apps.
+# Pero el repo AppImage/appimage.github.io tiene un archivo por app bajo
+# data/<Name> con la URL directa del .AppImage. Lo bajamos por raw.githubusercontent.com
+# (CDN de GitHub, sin rate limit significativo) en paralelo.
+ORPHAN_TOTAL=$(wc -l < "$ORPHANS_LIST" 2>/dev/null || echo 0)
+ORPHAN_TOTAL=${ORPHAN_TOTAL//[^0-9]/}
+[[ -z "$ORPHAN_TOTAL" ]] && ORPHAN_TOTAL=0
+rescued_count=0
+
+if [[ $ORPHAN_TOTAL -gt 0 ]]; then
+  echo ""
+  echo "Segundo pass: resolviendo URL directa para $ORPHAN_TOTAL apps (cascada data/ -> GitHub API -> HTML, paralelo x10)..."
+
+  # #editado por josejp2424 - resolver cada app con cascada de 3 fuentes:
+  #   1) data/<n> en el repo AppImageHub (sin rate limit, CDN)
+  #   2) GitHub API /repos/<owner>/<repo>/releases/latest (60/h sin token, 5000/h con)
+  #   3) HTML scrape de /releases/expanded_assets/<tag>
+  # La primera que devuelva URL que termine en .appimage (case-insensitive) gana.
+  resolve_orphan() {
+    local line="$1"
+    local orphan_name="${line%%|*}"
+    local rest="${line#*|}"
+    local orphan_id="${rest%%|*}"
+    local orphan_gh="${rest#*|}"
+    [[ "$orphan_gh" == "$rest" ]] && orphan_gh=""
+    # Si orphan_gh es URL completa, extraer owner/repo
+    if [[ -n "$orphan_gh" ]]; then
+      orphan_gh=$(echo "$orphan_gh" | sed -E 's|^https?://github\.com/||; s|/releases.*$||; s|\.git$||; s|/$||')
+    fi
+    local resolved_url=""
+
+    # --- Fuente 1: data/<n> en el repo AppImageHub ---
+    local body
+    if command -v curl >/dev/null 2>&1; then
+      body=$(curl -fsSL --max-time 8 "${DATA_RAW_URL}/${orphan_name}" 2>/dev/null || echo "")
+    else
+      body=$(wget -q --timeout=8 -O- "${DATA_RAW_URL}/${orphan_name}" 2>/dev/null || echo "")
+    fi
+    if [[ -n "$body" ]]; then
+      local u
+      u=$(echo "$body" | grep -oE '^https?://[^[:space:]]+' | head -n1 || true)
+      if [[ -n "$u" ]]; then
+        local low_u
+        low_u=$(echo "$u" | tr '[:upper:]' '[:lower:]')
+        low_u="${low_u%%\?*}"
+        low_u="${low_u%%#*}"
+        if [[ "$low_u" == *.appimage ]]; then
+          resolved_url="$u"
+        fi
+      fi
+    fi
+
+    # --- Fuente 2: GitHub API (requiere github_path) ---
+    if [[ -z "$resolved_url" && -n "$orphan_gh" && "$orphan_gh" == */* ]]; then
+      local api_url="https://api.github.com/repos/${orphan_gh}/releases/latest"
+      local api_json
+      if [[ -n "${GITHUB_TOKEN:-}" ]]; then
+        api_json=$(curl -fsSL --max-time 8 -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${GITHUB_TOKEN}" "$api_url" 2>/dev/null || echo "")
+      else
+        api_json=$(curl -fsSL --max-time 8 -H "Accept: application/vnd.github+json" "$api_url" 2>/dev/null || echo "")
+      fi
+      if [[ -n "$api_json" ]] && command -v jq >/dev/null 2>&1; then
+        local u
+        u=$(echo "$api_json" | jq -r '.assets[]? | select(.name | test("\\.appimage$"; "i")) | select(.name | test("x86[_-]?64|amd64"; "i")) | .browser_download_url' 2>/dev/null | head -n1 || true)
+        if [[ -z "$u" ]]; then
+          u=$(echo "$api_json" | jq -r '.assets[]? | select(.name | test("\\.appimage$"; "i")) | select(.name | test("\\.zsync$"; "i") | not) | .browser_download_url' 2>/dev/null | head -n1 || true)
+        fi
+        [[ -n "$u" ]] && resolved_url="$u"
+      fi
+    fi
+
+    # --- Fuente 3: HTML scrape de expanded_assets ---
+    if [[ -z "$resolved_url" && -n "$orphan_gh" && "$orphan_gh" == */* ]]; then
+      local final_url tag=""
+      final_url=$(curl -fsSLI --max-time 8 -A "essora-store" -o /dev/null -w "%{url_effective}" "https://github.com/${orphan_gh}/releases/latest" 2>/dev/null || echo "")
+      tag=$(echo "$final_url" | grep -oE 'releases/tag/[^?#]+' | sed 's|releases/tag/||' | head -n1)
+      if [[ -n "$tag" ]]; then
+        local html
+        html=$(curl -fsSL --max-time 8 -A "essora-store" "https://github.com/${orphan_gh}/releases/expanded_assets/${tag}" 2>/dev/null || echo "")
+        if [[ -n "$html" ]]; then
+          local href
+          href=$(echo "$html" | grep -oiE 'href="/[^"]+x86[_-]?64[^"]*\.appimage"' | head -n1 | sed -E 's|^href="||; s|"$||')
+          if [[ -z "$href" ]]; then
+            href=$(echo "$html" | grep -oiE 'href="/[^"]+\.appimage"' | head -n1 | sed -E 's|^href="||; s|"$||')
+          fi
+          if [[ -n "$href" ]]; then
+            resolved_url="https://github.com${href}"
+          fi
+        fi
+      fi
+    fi
+
+    echo "${orphan_id}|${resolved_url}"
+  }
+  export -f resolve_orphan
+  export DATA_RAW_URL
+  # #agregado por josejp2424 — propagar GITHUB_TOKEN al worker si está seteado
+  [[ -n "${GITHUB_TOKEN:-}" ]] && export GITHUB_TOKEN
+
+  : > "$ORPHANS_RESOLVED"
+  # xargs corre en paralelo; cada worker imprime una línea al stdout.
+  # Con 1,300+ apps, 20 workers bajan el tiempo total a ~1-2 minutos.
+  if command -v xargs >/dev/null 2>&1; then
+    # shellcheck disable=SC2002
+    cat "$ORPHANS_LIST" | xargs -I{} -P 20 bash -c 'resolve_orphan "$@"' _ {} > "$ORPHANS_RESOLVED" 2>/dev/null || true
+  else
+    # Fallback secuencial si no hay xargs
+    while IFS= read -r line; do
+      resolve_orphan "$line" >> "$ORPHANS_RESOLVED"
+    done < "$ORPHANS_LIST"
+  fi
+
+  # Contar cuántas se resolvieron
+  rescued_count=$(grep -cE '\|https?://' "$ORPHANS_RESOLVED" 2>/dev/null || echo 0)
+  rescued_count=${rescued_count//[^0-9]/}
+  [[ -z "$rescued_count" ]] && rescued_count=0
+
+  # Post-procesar el JSON: reemplazar url:"" por url:"<resolved>" donde corresponda
+  if [[ $rescued_count -gt 0 ]]; then
+    echo "  → $rescued_count URLs rescatadas, actualizando JSON..."
+    # Construimos un mapa id→url en jq-friendly y actualizamos el JSON
+    MAP_JSON="/tmp/appimage_map_$$.json"
+    trap 'rm -f "$FEED_CACHE" "$ORPHANS_LIST" "$ORPHANS_RESOLVED" "$MAP_JSON"' EXIT
+
+    # Convertir "id|url" a JSON {id: url}
+    jq -R -s '
+      split("\n")
+      | map(select(. != "" and (contains("|http"))))
+      | map(split("|") | {key: .[0], value: .[1]})
+      | from_entries
+    ' "$ORPHANS_RESOLVED" > "$MAP_JSON"
+
+    # Aplicar el mapa al JSON principal
+    TMP_JSON="${JSON_FILE}.tmp"
+    jq --slurpfile map "$MAP_JSON" '
+      (.) as $arr
+      | ($map[0]) as $m
+      | $arr | map(
+          if .url == "" and ($m[.id] // "") != ""
+          then .url = $m[.id]
+          else .
+          end
+        )
+    ' "$JSON_FILE" > "$TMP_JSON" && mv "$TMP_JSON" "$JSON_FILE"
+  fi
+fi
+
 echo "$TODAY" > "$LAST_UPDATE_FILE"
 
 echo ""
 echo "✔ Generado: $JSON_FILE"
 echo "• Apps: $total  |  Instaladas: $installed_count  |  Actualizaciones: $upd_count"
+# #agregado por josejp2424 — stats del segundo pass
+if [[ $ORPHAN_TOTAL -gt 0 ]]; then
+  echo "• Segundo pass: $rescued_count/$ORPHAN_TOTAL URLs resueltas (data/ + GitHub API + HTML)"
+fi
 echo "• Íconos cacheados en: $ICON_CACHE_DIR"
