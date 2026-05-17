@@ -612,7 +612,6 @@ class ActivityManager:
         más rápido que llamar install() N veces.
         """
         ids = [str(x).strip() for x in (app_ids or []) if str(x).strip()]
-        # quitar duplicados preservando orden
         seen = set()
         uniq = []
         for i in ids:
@@ -750,9 +749,9 @@ class ActivityManager:
         
         if process.returncode == 0:
             self._reload_catalog("flatpak")
-            GLib.idle_add(self.gui.on_activity_done, tr("All Flatpak packages updated"))
+            GLib.idle_add(self.gui.on_activity_done, True, "", None)
         else:
-            GLib.idle_add(self.gui.on_activity_done, tr("Error updating Flatpak packages"))
+            GLib.idle_add(self.gui.on_activity_done, False, tr("Error updating Flatpak packages"), None)
     
     def _update_all_deb(self):
         from gi.repository import GLib
@@ -777,7 +776,7 @@ class ActivityManager:
 
         if p1.returncode != 0:
             GLib.idle_add(self.gui.hide_progress_dialog)
-            GLib.idle_add(self.gui.on_activity_done, tr("Error updating package lists"))
+            GLib.idle_add(self.gui.on_activity_done, False, tr("Error updating package lists"), None)
             return
 
         GLib.idle_add(self.gui.update_progress_text, tr("Upgrading packages..."))
@@ -795,9 +794,9 @@ class ActivityManager:
 
         if rc == 0:
             self._reload_catalog("deb")
-            GLib.idle_add(self.gui.on_activity_done, tr("All DEB packages updated"))
+            GLib.idle_add(self.gui.on_activity_done, True, "", None)
         else:
-            GLib.idle_add(self.gui.on_activity_done, tr("Error upgrading packages"))
+            GLib.idle_add(self.gui.on_activity_done, False, tr("Error upgrading packages"), None)
 
     def update_one(self, pkg_type: str, pkg_id: str):
         """Updates a single package (called from UpdateRow)"""
